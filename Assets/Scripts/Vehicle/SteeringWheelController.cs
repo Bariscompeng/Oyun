@@ -8,6 +8,7 @@ public class SteeringWheelController : MonoBehaviour
     [Header("Ayarlar")]
     [SerializeField] private float maxRotationAngle = 360f; // Tam sag veya tam solda kac derece donecegi
     [SerializeField] private Vector3 rotationAxis = Vector3.forward; // Varsayılan Z ekseni
+    [SerializeField] private float straightAngleOffset = 0f; // Direksiyonun düz durması için açı ofseti
 
     private Quaternion originalRotation;
 
@@ -27,7 +28,7 @@ public class SteeringWheelController : MonoBehaviour
         // Tekerleklerin direksiyon girdi degeri (-1 ile +1 arasinda)
         float steerInput = carController.SteerInput;
 
-        // Belirlenen eksende döndür
-        transform.localRotation = originalRotation * Quaternion.AngleAxis(-steerInput * maxRotationAngle, rotationAxis);
+        // Belirlenen eksende döndür, düzleştirme ofsetini ekle
+        transform.localRotation = originalRotation * Quaternion.AngleAxis(straightAngleOffset - steerInput * maxRotationAngle, rotationAxis);
     }
 }

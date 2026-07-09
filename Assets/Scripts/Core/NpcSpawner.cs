@@ -1,476 +1,538 @@
 using UnityEngine;
-using System.Collections.Generic;
+using System.Collections;
 
 namespace TrafikParkuru.Core
 {
     /// <summary>
-    /// Haritaya statik (park halinde) ve hareketli NPC araçlar/yayalar yerleştirir.
-    /// Tamamen performans dostu, basit matematiksel hareketler kullanır.
+    /// Haritaya NPC araçlar ve yayalar yerleştirir.
+    ///
+    /// Sahne sabitleri:
+    ///   Yol yüzeyi     Y = 0.10
+    ///   Kaldırım yüzeyi Y = 0.155  (Y=0.08, scale Y=0.15)
+    ///   Sağ şerit (→+Z) X = +1.8
+    ///   Sol şerit (→-Z) X = -1.8
+    ///   Sol kaldırım   X = -5.5
+    ///   Sağ kaldırım   X = +5.5
+    ///   Yaya geçidi    Z = -60
     /// </summary>
     public class NpcSpawner : MonoBehaviour
     {
-        [Header("NPC Prefabları (Opsiyonel)")]
+        [Header("NPC Prefabları")]
         [SerializeField] private GameObject npcCarPrefab;
         [SerializeField] private GameObject npcPedestrianPrefab;
 
-        private List<GameObject> activeNpcs = new List<GameObject>();
+        // ── Sahne sabitleri ─────────────────────────────────────────────────
+        private const float RoadY      = 0.10f;   // Yol yüzey Y
+        private const float SidewalkY  = 0.16f;   // Kaldırım yüzey Y
+        private const float RightLaneX = 1.8f;    // Sağ şerit X (+Z yönü)
+        private const float LeftLaneX  = -1.8f;   // Sol şerit X (-Z yönü)
+        private const float SideRoadRightZ = -1.8f; // Yan yol sağ şerit Z
+        private const float SideRoadLeftZ  =  1.8f; // Yan yol sol şerit Z
+        private const float LeftSidewalkX  = -5.5f;
+        private const float RightSidewalkX =  5.5f;
+        private const float CrosswalkZ     = -60f;  // Yaya geçidi Z
 
-        // Yol sabitleri
-        // Ana yol: X = -5 → +5, merkez çizgi X = 0
-        // Sağ şerit (ileri): X ≈ +1.8  (merkez)
-        // Sol şerit (geri):  X ≈ -1.8  (merkez)
-        // Yan yol: Z ekseninde, Z = -5 → +5 arası kavşak bölgesi
-        private const float rightLaneX = 1.8f;
-        private const float leftLaneX = -1.8f;
-        private const float spawnY = 0.1f; // Yol yüzeyi seviyesi (raycast ile düzeltilecek)
-        private const float sideRoadRightZ = -1.8f;
-        private const float sideRoadLeftZ = 1.8f;
+        // Araç spawn Y = RoadY; NpcDriver.ComputeLockedY BoxCollider bounds'tan doğru pivot Y'yi hesaplar.
 
         private void Start()
         {
-            SpawnMovingCars();
-            SpawnSidewalkPedestrians();
+            SpawnCars();
+            SpawnPedestrians();
+            SpawnCrosswalkMarking(); // Kaldırımdan kaldırıma tam yaya geçidi şeritleri
         }
 
-        private struct SpawnData
+        // ════════════════════════════════════════════════════════════════════
+        // ARAÇLAR
+        // ════════════════════════════════════════════════════════════════════
+
+        private void SpawnCars()
         {
-            public Vector3 pos;
-            public float angle;
-            public Vector3[] loop;
-            public float speed;
-        }
+            float carY = RoadY; // NpcDriver.ComputeLockedY collider bounds'tan gerçek yüksekliği hesaplar
 
-        private void SpawnMovingCars()
-        {
-            // === SAĞ ŞERİT: +Z yönünde ilerliyor (x = +1.8) ===
-            Vector3[] rightLaneForward = new Vector3[]
-            {
-                new Vector3(rightLaneX, spawnY, -145f),
-                new Vector3(rightLaneX, spawnY, -100f),
-                new Vector3(rightLaneX, spawnY, -50f),
-                new Vector3(rightLaneX, spawnY, 0f),
-                new Vector3(rightLaneX, spawnY, 50f),
-                new Vector3(rightLaneX, spawnY, 100f),
-                new Vector3(rightLaneX, spawnY, 145f),
+            // Sağ şerit waypoint'leri (+Z yönü)
+            Vector3[] rightLoop = {
+                new Vector3(RightLaneX, carY, -130f),
+                new Vector3(RightLaneX, carY,  -70f),
+                new Vector3(RightLaneX, carY,    0f),
+                new Vector3(RightLaneX, carY,   70f),
+                new Vector3(RightLaneX, carY,  130f),
             };
 
-            // === SOL ŞERİT: -Z yönünde ilerliyor (x = -1.8) ===
-            Vector3[] leftLaneForward = new Vector3[]
-            {
-                new Vector3(leftLaneX, spawnY, 145f),
-                new Vector3(leftLaneX, spawnY, 100f),
-                new Vector3(leftLaneX, spawnY, 50f),
-                new Vector3(leftLaneX, spawnY, 0f),
-                new Vector3(leftLaneX, spawnY, -50f),
-                new Vector3(leftLaneX, spawnY, -100f),
-                new Vector3(leftLaneX, spawnY, -145f),
+            // Sol şerit waypoint'leri (-Z yönü)
+            Vector3[] leftLoop = {
+                new Vector3(LeftLaneX, carY,  130f),
+                new Vector3(LeftLaneX, carY,   70f),
+                new Vector3(LeftLaneX, carY,    0f),
+                new Vector3(LeftLaneX, carY,  -70f),
+                new Vector3(LeftLaneX, carY, -130f),
             };
 
-            // === SAĞ ŞERİT → Kavşaktan sağa dönen rota ===
-            Vector3[] rightTurnRoute = new Vector3[]
-            {
-                new Vector3(rightLaneX, spawnY, -145f),
-                new Vector3(rightLaneX, spawnY, -20f),
-                new Vector3(rightLaneX, spawnY, -5f),
-                // Kavşakta sağa dönüş (yumuşak viraj)
-                new Vector3(3.5f, spawnY, -1.8f),
-                new Vector3(5f, spawnY, sideRoadRightZ),
-                new Vector3(15f, spawnY, sideRoadRightZ),
-                new Vector3(30f, spawnY, sideRoadRightZ),
-                new Vector3(50f, spawnY, sideRoadRightZ),
+            // Yan yol düz gidiş (+X yönü)
+            Vector3[] sideLoop = {
+                new Vector3(10f,  carY, SideRoadRightZ),
+                new Vector3(30f,  carY, SideRoadRightZ),
+                new Vector3(50f,  carY, SideRoadRightZ),
             };
 
-            // === Yan yoldan ana yola çıkan rota (soldan sağa) ===
-            Vector3[] sideToMainRoute = new Vector3[]
+            // Spawn noktaları: (pozisyon, açı, waypoints, hız)
+            var cars = new (Vector3 pos, float yaw, Vector3[] wps, float spd)[]
             {
-                new Vector3(50f, spawnY, sideRoadLeftZ),
-                new Vector3(30f, spawnY, sideRoadLeftZ),
-                new Vector3(15f, spawnY, sideRoadLeftZ),
-                new Vector3(5f, spawnY, sideRoadLeftZ),
-                // Kavşakta sola dönüş
-                new Vector3(3.5f, spawnY, 1.8f),
-                new Vector3(rightLaneX, spawnY, 5f),
-                new Vector3(rightLaneX, spawnY, 50f),
-                new Vector3(rightLaneX, spawnY, 100f),
-                new Vector3(rightLaneX, spawnY, 145f),
+                // Sağ şerit — 3 araç aralıklı
+                (new Vector3(RightLaneX, carY, -110f), 0f,   rightLoop, Random.Range(6f, 8f)),
+                (new Vector3(RightLaneX, carY,  -20f), 0f,   rightLoop, Random.Range(6f, 8f)),
+                (new Vector3(RightLaneX, carY,   80f), 0f,   rightLoop, Random.Range(6f, 8f)),
+
+                // Sol şerit — 3 araç aralıklı
+                (new Vector3(LeftLaneX,  carY,  110f), 180f, leftLoop,  Random.Range(5f, 7f)),
+                (new Vector3(LeftLaneX,  carY,   10f), 180f, leftLoop,  Random.Range(5f, 7f)),
+                (new Vector3(LeftLaneX,  carY,  -80f), 180f, leftLoop,  Random.Range(5f, 7f)),
+
+                // Yan yol — 1 araç
+                (new Vector3(15f, carY, SideRoadRightZ), 90f, sideLoop, Random.Range(4f, 6f)),
             };
 
-            // Spawn pozisyonları
-            SpawnData[] spawns = new SpawnData[]
+            foreach (var c in cars)
             {
-                // === Ana yol sağ şerit (+Z yönü, ilerleyen) ===
-                new SpawnData { pos = new Vector3(rightLaneX, spawnY, -125f), angle = 0f,   loop = rightLaneForward, speed = Random.Range(6f, 9f) },
-                new SpawnData { pos = new Vector3(rightLaneX, spawnY, -60f),  angle = 0f,   loop = rightLaneForward, speed = Random.Range(6f, 9f) },
-                new SpawnData { pos = new Vector3(rightLaneX, spawnY, 30f),   angle = 0f,   loop = rightLaneForward, speed = Random.Range(6f, 9f) },
-                new SpawnData { pos = new Vector3(rightLaneX, spawnY, 90f),   angle = 0f,   loop = rightLaneForward, speed = Random.Range(6f, 9f) },
+                GameObject car = CreateNpcCar(c.pos, Quaternion.Euler(0f, c.yaw, 0f));
 
-                // === Ana yol sol şerit (-Z yönü, karşıdan gelen) ===
-                new SpawnData { pos = new Vector3(leftLaneX, spawnY, 120f),  angle = 180f, loop = leftLaneForward,  speed = Random.Range(5f, 8f) },
-                new SpawnData { pos = new Vector3(leftLaneX, spawnY, 60f),   angle = 180f, loop = leftLaneForward,  speed = Random.Range(5f, 8f) },
-                new SpawnData { pos = new Vector3(leftLaneX, spawnY, -20f),  angle = 180f, loop = leftLaneForward,  speed = Random.Range(5f, 8f) },
-                new SpawnData { pos = new Vector3(leftLaneX, spawnY, -90f),  angle = 180f, loop = leftLaneForward,  speed = Random.Range(5f, 8f) },
-
-                // === Kavşaktan sağa dönen araç ===
-                new SpawnData { pos = new Vector3(rightLaneX, spawnY, -40f), angle = 0f,   loop = rightTurnRoute,   speed = Random.Range(5f, 7f) },
-
-                // === Yan yoldan ana yola çıkan araç ===
-                new SpawnData { pos = new Vector3(40f, spawnY, sideRoadLeftZ), angle = 270f, loop = sideToMainRoute, speed = Random.Range(5f, 7f) },
-
-                // === Yan yol düz trafik ===
-                new SpawnData { pos = new Vector3(20f, spawnY, sideRoadRightZ), angle = 90f, loop = new Vector3[] {
-                    new Vector3(10f, spawnY, sideRoadRightZ),
-                    new Vector3(25f, spawnY, sideRoadRightZ),
-                    new Vector3(45f, spawnY, sideRoadRightZ),
-                }, speed = Random.Range(5f, 7f) },
-            };
-
-            foreach (var spawn in spawns)
-            {
-                GameObject car = CreateNpcCar(spawn.pos, Quaternion.Euler(0f, spawn.angle, 0f));
-                car.name = "MovingNPC_Car";
-
-                // NpcDriver bileşenini ekle
-                var driver = car.AddComponent<NpcDriver>();
-                driver.waypoints = spawn.loop;
-                driver.speed = spawn.speed;
-                driver.rotationSpeed = 4f;
+                NpcDriver driver       = car.AddComponent<NpcDriver>();
+                driver.waypoints       = c.wps;
+                driver.speed           = c.spd;
+                driver.rotationSpeed   = 4f;
                 driver.arrivalDistance = 4f;
-                driver.detectionDistance = 15f;
-                driver.stopDistance = 5f;
-                driver.groundOffset = 0.4f;
-            }
-        }
-
-        private void SpawnSidewalkPedestrians()
-        {
-            // Kaldırımda yürüyen yayalar
-            Vector3[] pedPositions = new Vector3[]
-            {
-                new Vector3(-5.5f, 0.9f, -110f),
-                new Vector3(5.5f, 0.9f, -70f),
-                new Vector3(-5.5f, 0.9f, -30f),
-                new Vector3(5.5f, 0.9f, 10f),
-                new Vector3(5.5f, 0.9f, 50f)
-            };
-
-            foreach (var pos in pedPositions)
-            {
-                GameObject ped = CreateNpcPedestrian(pos, Random.Range(1.8f, 2.4f));
-                ped.name = "NPC_Pedestrian";
+                driver.detectionDistance = 14f;
+                driver.stopDistance    = 5f;
+                driver.roadSurfaceY    = RoadY;
             }
         }
 
         private GameObject CreateNpcCar(Vector3 position, Quaternion rotation)
         {
             GameObject car;
+
             if (npcCarPrefab != null)
             {
                 car = Instantiate(npcCarPrefab, position, rotation);
                 car.name = "NPC_Car";
                 car.transform.localScale = new Vector3(55f, 55f, 55f);
-                ApplyNpcCarUpgrades(car);
+                SetupNpcCarPhysics(car);
+                PaintNpcCar(car);
             }
             else
             {
-                // Basit renkli bir kutu oluştur
-                car = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                car.name = "NPC_Car";
-                car.transform.position = position;
-                car.transform.rotation = rotation;
-                car.transform.localScale = new Vector3(1.6f, 0.8f, 3.5f);
-
-                Renderer rend = car.GetComponent<Renderer>();
-                if (rend != null)
-                {
-                    Material newMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                    newMat.SetColor("_BaseColor", GetRandomCarColor());
-                    newMat.SetFloat("_Smoothness", 0.7f);
-                    newMat.SetFloat("_Metallic", 0.5f);
-                    rend.sharedMaterial = newMat;
-                }
-
-                // Tekerlek taklidi
-                CreateWheelVisuals(car);
-
-                Rigidbody rb = car.GetComponent<Rigidbody>();
-                if (rb == null) rb = car.AddComponent<Rigidbody>();
-                rb.mass = 1500f;
-                rb.isKinematic = true;
+                car = CreateBoxCar(position, rotation);
             }
 
             car.transform.SetParent(transform, true);
-            activeNpcs.Add(car);
             return car;
         }
 
-        private void ApplyNpcCarUpgrades(GameObject car)
+        private void SetupNpcCarPhysics(GameObject car)
         {
-            if (car == null) return;
+            // Fabric vs. gereksiz objeleri kaldır
+            var toDelete = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform t in car.GetComponentsInChildren<Transform>(true))
+                if (t != null && t.name.ToLower().Contains("fabric"))
+                    toDelete.Add(t.gameObject);
+            foreach (var g in toDelete) DestroyImmediate(g);
 
-            // 0. Platform Kaldırma (Fabric nesnesini tamamen yok et)
-            var fabricList = new System.Collections.Generic.List<GameObject>();
-            foreach (Transform child in car.GetComponentsInChildren<Transform>(true))
-            {
-                if (child != null && child.name.ToLower().Contains("fabric"))
-                {
-                    fabricList.Add(child.gameObject);
-                }
-            }
-            foreach (var f in fabricList)
-            {
-                DestroyImmediate(f);
-            }
-
-            // 1. Fiziksel Çarpıştırıcı ve Rigidbody Kurulumu
+            // BoxCollider
             BoxCollider col = car.GetComponent<BoxCollider>();
-            if (col == null)
-            {
-                col = car.AddComponent<BoxCollider>();
-            }
+            if (col == null) col = car.AddComponent<BoxCollider>();
             col.center = new Vector3(0f, 0.012f, 0.005f);
-            col.size = new Vector3(0.03f, 0.024f, 0.07f);
+            col.size   = new Vector3(0.03f, 0.024f, 0.07f);
 
+            // Rigidbody — kinematic (NpcDriver kendi hareketi kontrol eder)
             Rigidbody rb = car.GetComponent<Rigidbody>();
-            if (rb == null)
-            {
-                rb = car.AddComponent<Rigidbody>();
-            }
-            rb.mass = 1500f;
+            if (rb == null) rb = car.AddComponent<Rigidbody>();
+            rb.mass        = 1500f;
             rb.isKinematic = true;
+            rb.useGravity  = false;
+        }
 
-            // 2. Materyal Giydirme
-            Renderer[] renderers = car.GetComponentsInChildren<Renderer>(true);
-            Color bodyColor = GetRandomDetailedCarColor();
-            foreach (var r in renderers)
+        private void PaintNpcCar(GameObject car)
+        {
+            Color bodyColor = RandomCarColor();
+            foreach (Renderer r in car.GetComponentsInChildren<Renderer>(true))
             {
-                Material newMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                if (r == null) continue;
+                string n = r.gameObject.name.ToLower();
+                Material m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
 
-                if (r.gameObject.name.Contains("Glass") || r.gameObject.name.Contains("glass") || r.gameObject.name.Contains("Windshield") || r.gameObject.name.Contains("Window"))
+                if (n.Contains("glass") || n.Contains("windshield") || n.Contains("window"))
                 {
-                    // Parlak Koyu Cam
-                    newMat.SetColor("_BaseColor", new Color(0.1f, 0.1f, 0.1f, 0.95f));
-                    newMat.SetFloat("_Smoothness", 0.9f);
-                    newMat.SetFloat("_Metallic", 0.9f);
-                    r.sharedMaterial = newMat;
+                    m.SetColor("_BaseColor", new Color(0.05f, 0.05f, 0.05f, 0.9f));
+                    m.SetFloat("_Smoothness", 0.92f);
+                    m.SetFloat("_Metallic",   0.9f);
                 }
-                else if (r.gameObject.name.Contains("ToyCar") || r.gameObject.name.Contains("Body") || r.gameObject.name.Contains("body") || r.gameObject.name == car.name)
+                else if (n.Contains("wheel") || n.Contains("tire"))
                 {
-                    // Metalik Araba Boyası
-                    newMat.SetColor("_BaseColor", bodyColor);
-                    newMat.SetFloat("_Smoothness", 0.85f);
-                    newMat.SetFloat("_Metallic", 0.8f);
-                    r.sharedMaterial = newMat;
+                    m.SetColor("_BaseColor", new Color(0.10f, 0.10f, 0.10f));
+                    m.SetFloat("_Smoothness", 0.1f);
+                    m.SetFloat("_Metallic",   0.0f);
                 }
-                else if (r.gameObject.name.Contains("Wheel") || r.gameObject.name.Contains("wheel") || r.gameObject.name.Contains("Tire") || r.gameObject.name.Contains("tire"))
+                else if (n.Contains("body") || n.Contains("toycar") || n == car.name.ToLower())
                 {
-                    // Mat Lastik Kauçuğu
-                    newMat.SetColor("_BaseColor", new Color(0.12f, 0.12f, 0.12f));
-                    newMat.SetFloat("_Smoothness", 0.15f);
-                    newMat.SetFloat("_Metallic", 0.05f);
-                    r.sharedMaterial = newMat;
+                    m.SetColor("_BaseColor", bodyColor);
+                    m.SetFloat("_Smoothness", 0.85f);
+                    m.SetFloat("_Metallic",   0.8f);
                 }
                 else
                 {
-                    // Diğer Parçalar
-                    newMat.SetColor("_BaseColor", new Color(0.2f, 0.2f, 0.22f));
-                    newMat.SetFloat("_Smoothness", 0.5f);
-                    newMat.SetFloat("_Metallic", 0.5f);
-                    r.sharedMaterial = newMat;
+                    m.SetColor("_BaseColor", new Color(0.18f, 0.18f, 0.20f));
+                    m.SetFloat("_Smoothness", 0.4f);
+                    m.SetFloat("_Metallic",   0.4f);
                 }
+                r.sharedMaterial = m;
             }
         }
 
-        private Color GetRandomDetailedCarColor()
+        private GameObject CreateBoxCar(Vector3 position, Quaternion rotation)
         {
-            Color[] colors = new Color[]
+            GameObject car = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            car.name = "NPC_Car";
+            car.transform.position   = position;
+            car.transform.rotation   = rotation;
+            car.transform.localScale = new Vector3(1.6f, 0.8f, 3.5f);
+
+            Renderer rend = car.GetComponent<Renderer>();
+            if (rend != null)
             {
-                new Color(0.65f, 0.08f, 0.08f), // Crimson red
-                new Color(0.08f, 0.08f, 0.09f), // Midnight black
-                new Color(0.95f, 0.95f, 0.95f), // Pearl white
-                new Color(0.4f, 0.42f, 0.45f),  // Slate gray
-                new Color(0.05f, 0.35f, 0.75f), // Electric blue
-                new Color(0.9f, 0.7f, 0.05f),   // Sunburst yellow
-                new Color(0.05f, 0.5f, 0.25f)   // Forest green
-            };
-            return colors[Random.Range(0, colors.Length)];
+                Material m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                m.SetColor("_BaseColor", RandomCarColor());
+                m.SetFloat("_Smoothness", 0.7f);
+                m.SetFloat("_Metallic",   0.5f);
+                rend.sharedMaterial = m;
+            }
+
+            Rigidbody rb = car.GetComponent<Rigidbody>() ?? car.AddComponent<Rigidbody>();
+            rb.mass = 1500f; rb.isKinematic = true; rb.useGravity = false;
+            return car;
         }
 
-        private GameObject CreateNpcPedestrian(Vector3 position, float walkSpeed)
+        // ════════════════════════════════════════════════════════════════════
+        // YAYALAR
+        // ════════════════════════════════════════════════════════════════════
+
+        private void SpawnPedestrians()
+        {
+            // Sol kaldırımda ileri/geri yürüyenler (3 kişi)
+            SpawnSidewalkWalker(new Vector3(LeftSidewalkX, SidewalkY, -100f), direction: 1);
+            SpawnSidewalkWalker(new Vector3(LeftSidewalkX, SidewalkY,  -30f), direction:-1);
+            SpawnSidewalkWalker(new Vector3(LeftSidewalkX, SidewalkY,   50f), direction: 1);
+
+            // Sağ kaldırımda ileri/geri yürüyenler (2 kişi)
+            SpawnSidewalkWalker(new Vector3(RightSidewalkX, SidewalkY,  -80f), direction:-1);
+            SpawnSidewalkWalker(new Vector3(RightSidewalkX, SidewalkY,   20f), direction: 1);
+
+            // Yaya geçidinden geçenler (2 kişi — sol → sağ ve sağ → sol)
+            SpawnCrosswalkPedestrian(startX: LeftSidewalkX  - 1f, endX: RightSidewalkX + 1f);
+            SpawnCrosswalkPedestrian(startX: RightSidewalkX + 1f, endX: LeftSidewalkX  - 1f);
+        }
+
+        private void SpawnSidewalkWalker(Vector3 startPos, int direction)
+        {
+            GameObject ped = CreatePedestrian(startPos);
+            var walker = ped.AddComponent<SidewalkWalker>();
+            walker.sidewalkY  = SidewalkY;
+            walker.speed      = Random.Range(1.4f, 2.0f);
+            walker.rangeZ     = Random.Range(20f, 35f);
+            walker.initialDir = direction;
+        }
+
+        private void SpawnCrosswalkPedestrian(float startX, float endX)
+        {
+            Vector3 startPos = new Vector3(startX, SidewalkY, CrosswalkZ);
+            GameObject ped   = CreatePedestrian(startPos);
+            var crosser      = ped.AddComponent<CrosswalkWalker>();
+            crosser.sidewalkY  = SidewalkY;
+            crosser.startX     = startX;
+            crosser.endX       = endX;
+            crosser.crosswalkZ = CrosswalkZ;
+            crosser.speed      = Random.Range(1.2f, 1.8f);
+            crosser.waitTime   = Random.Range(3f, 8f);  // Başlamadan önce bekle
+        }
+
+        private GameObject CreatePedestrian(Vector3 position)
         {
             GameObject ped;
             if (npcPedestrianPrefab != null)
             {
                 ped = Instantiate(npcPedestrianPrefab, position, Quaternion.identity);
                 ped.name = "NPC_Pedestrian";
-                ApplyNpcPedestrianUpgrades(ped);
+                ApplyPedestrianColors(ped);
             }
             else
             {
                 ped = GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 ped.name = "NPC_Pedestrian";
-                ped.transform.position = position;
-                ped.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
-
-                Renderer rend = ped.GetComponent<Renderer>();
-                if (rend != null)
+                ped.transform.position   = position;
+                ped.transform.localScale = new Vector3(0.4f, 0.85f, 0.4f);
+                Renderer r = ped.GetComponent<Renderer>();
+                if (r != null)
                 {
-                    Material newMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                    newMat.SetColor("_BaseColor", Color.green);
-                    newMat.SetFloat("_Smoothness", 0.1f);
-                    newMat.SetFloat("_Metallic", 0.0f);
-                    rend.sharedMaterial = newMat;
+                    Material m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    m.SetColor("_BaseColor", RandomPedestrianColor());
+                    r.sharedMaterial = m;
                 }
             }
 
+            // Rigidbody (kinematic — script kontrol eder)
+            Rigidbody rb = ped.GetComponent<Rigidbody>() ?? ped.AddComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity  = false;
+
             ped.transform.SetParent(transform, true);
-            activeNpcs.Add(ped);
-
-            // Sağa/sola veya ileri/geri küçük gezinme scripti ekle
-            var wander = ped.AddComponent<SimpleWanderer>();
-            wander.speed = walkSpeed;
-            wander.rangeZ = 15f;
-
             return ped;
         }
 
-        private void ApplyNpcPedestrianUpgrades(GameObject ped)
+        private void ApplyPedestrianColors(GameObject ped)
         {
-            if (ped == null) return;
-
-            Renderer[] renderers = ped.GetComponentsInChildren<Renderer>(true);
-            Color clothesColor = GetRandomPedestrianColor();
-            foreach (var r in renderers)
+            Color c = RandomPedestrianColor();
+            foreach (Renderer r in ped.GetComponentsInChildren<Renderer>(true))
             {
-                Texture mainTex = null;
+                if (r == null) continue;
+                // Orijinal texture'ı koru, sadece renge karıştır
+                Texture tex = null;
                 if (r.sharedMaterial != null)
                 {
-                    if (r.sharedMaterial.HasProperty("_BaseMap")) mainTex = r.sharedMaterial.GetTexture("_BaseMap");
-                    else if (r.sharedMaterial.HasProperty("_MainTex")) mainTex = r.sharedMaterial.GetTexture("_MainTex");
+                    if (r.sharedMaterial.HasProperty("_BaseMap")) tex = r.sharedMaterial.GetTexture("_BaseMap");
+                    else if (r.sharedMaterial.HasProperty("_MainTex")) tex = r.sharedMaterial.GetTexture("_MainTex");
                 }
-
-                Material newMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                if (mainTex != null)
-                {
-                    newMat.SetTexture("_BaseMap", mainTex);
-                    newMat.SetColor("_BaseColor", Color.Lerp(Color.white, clothesColor, 0.4f));
-                }
-                else
-                {
-                    newMat.SetColor("_BaseColor", clothesColor);
-                }
-                newMat.SetFloat("_Smoothness", 0.1f);
-                newMat.SetFloat("_Metallic", 0.0f);
-                r.sharedMaterial = newMat;
+                Material m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                if (tex != null) m.SetTexture("_BaseMap", tex);
+                m.SetColor("_BaseColor", tex != null ? Color.Lerp(Color.white, c, 0.35f) : c);
+                m.SetFloat("_Smoothness", 0.05f);
+                r.sharedMaterial = m;
             }
         }
 
-        private Color GetRandomPedestrianColor()
+        // ════════════════════════════════════════════════════════════════════
+        // YAYA GEÇİDİ MARKALARI — kaldırımdan kaldırıma tam şeritler
+        // ════════════════════════════════════════════════════════════════════
+
+        private void SpawnCrosswalkMarking()
         {
-            Color[] colors = new Color[]
-            {
-                new Color(0.1f, 0.4f, 0.8f),  // Blue
-                new Color(0.8f, 0.2f, 0.2f),  // Red
-                new Color(0.2f, 0.6f, 0.3f),  // Green
-                new Color(0.9f, 0.6f, 0.1f),  // Orange
-                new Color(0.5f, 0.2f, 0.6f),  // Purple
-                new Color(0.4f, 0.3f, 0.2f)   // Brown
-            };
-            return colors[Random.Range(0, colors.Length)];
+            // Sahne'deki ZebraCrossing yolun ortasını kaplıyor (X:-3..+3).
+            // Kaldırım bölgelerini de kapatmak için kaldırım üstüne şeritler ekliyoruz.
+            // Şerit parametreleri sahneyle eşleştirildi:
+            //   Genişlik (X) : 0.60  |  Yükseklik (Y) : 0.02  |  Derinlik (Z) : 4.0
+            //   Renk: Beyaz   |  Y pozisyonu: 0.07 (yol/kaldırım üstünde)
+
+            const float stripeW  = 0.60f;
+            const float stripeD  = 4.0f;    // Z boyutu (yaya geçidi derinliği)
+            const float stripeH  = 0.02f;
+            const float stripeY  = 0.07f;   // Zemin üstünde ince tabaka
+            const float spacing  = 1.50f;   // Şerit aralığı (sahneyle aynı)
+
+            // Sol kaldırım şeritleri: X = -5.5 ± (kaldırım genişliği/2)
+            // Kaldırım X merkezi = -5.5, genişlik ≈ 1 unit → şeritler X: -5.75 ve -5.25
+            float[] leftSidewalkX  = { -4.75f, -5.25f };
+            float[] rightSidewalkX = {  4.75f,  5.25f };
+
+            Material whiteMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            whiteMat.SetColor("_BaseColor", Color.white);
+            whiteMat.SetFloat("_Smoothness", 0.05f);
+
+            GameObject crosswalkParent = new GameObject("NPC_CrosswalkExtension");
+            crosswalkParent.transform.SetParent(transform, false);
+
+            // Sol kaldırım şeritleri
+            foreach (float sx in leftSidewalkX)
+                CreateStripe(crosswalkParent.transform, sx, stripeY, CrosswalkZ,
+                             stripeW, stripeH, stripeD, whiteMat);
+
+            // Sağ kaldırım şeritleri
+            foreach (float sx in rightSidewalkX)
+                CreateStripe(crosswalkParent.transform, sx, stripeY, CrosswalkZ,
+                             stripeW, stripeH, stripeD, whiteMat);
         }
 
-        private Color GetRandomCarColor()
+        private static void CreateStripe(Transform parent, float x, float y, float z,
+                                         float w, float h, float d, Material mat)
         {
-            Color[] colors = new Color[] { Color.red, Color.gray, Color.black, Color.white, new Color(0f, 0.5f, 1f) };
-            return colors[Random.Range(0, colors.Length)];
+            GameObject s = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            s.name = "CrosswalkStripe";
+            Destroy(s.GetComponent<BoxCollider>()); // Fizik etkileşimi istemiyoruz
+            s.transform.SetParent(parent, false);
+            s.transform.localPosition = new Vector3(x, y, z);
+            s.transform.localScale    = new Vector3(w, h, d);
+            Renderer r = s.GetComponent<Renderer>();
+            if (r != null) r.sharedMaterial = mat;
         }
 
-        private void CreateWheelVisuals(GameObject parent)
-        {
-            Vector3[] wheelOffsets = new Vector3[]
-            {
-                new Vector3(-0.9f, -0.3f, 1.2f),
-                new Vector3(0.9f, -0.3f, 1.2f),
-                new Vector3(-0.9f, -0.3f, -1.2f),
-                new Vector3(0.9f, -0.3f, -1.2f)
-            };
+        // ── Renk yardımcıları ────────────────────────────────────────────────
+        private static readonly Color[] CarColors = {
+            new Color(0.62f, 0.07f, 0.07f), // Crimson
+            new Color(0.06f, 0.06f, 0.08f), // Black
+            new Color(0.93f, 0.93f, 0.93f), // White
+            new Color(0.38f, 0.40f, 0.43f), // Gray
+            new Color(0.04f, 0.32f, 0.72f), // Blue
+            new Color(0.88f, 0.68f, 0.04f), // Yellow
+            new Color(0.04f, 0.48f, 0.24f), // Green
+        };
 
-            foreach (var offset in wheelOffsets)
-            {
-                GameObject wheel = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                wheel.name = "Wheel";
-                wheel.transform.SetParent(parent.transform, false);
-                wheel.transform.localPosition = offset;
-                wheel.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
-                wheel.transform.localScale = new Vector3(0.6f, 0.15f, 0.6f);
-                
-                Renderer r = wheel.GetComponent<Renderer>();
-                if (r != null) r.material.color = Color.black;
-                
-                Collider col = wheel.GetComponent<Collider>();
-                if (col != null) Destroy(col);
-            }
-        }
+        private static readonly Color[] PedColors = {
+            new Color(0.10f, 0.38f, 0.76f),
+            new Color(0.76f, 0.18f, 0.18f),
+            new Color(0.18f, 0.56f, 0.28f),
+            new Color(0.86f, 0.56f, 0.08f),
+            new Color(0.46f, 0.18f, 0.58f),
+            new Color(0.38f, 0.28f, 0.18f),
+        };
+
+        private static Color RandomCarColor()        => CarColors[Random.Range(0, CarColors.Length)];
+        private static Color RandomPedestrianColor() => PedColors[Random.Range(0, PedColors.Length)];
     }
 
-    // Basit ileri/geri hareket scripti
-    public class SimpleMover : MonoBehaviour
+    // ════════════════════════════════════════════════════════════════════════
+    // KALDIRM YÜRÜYÜŞÜ — kaldırımda ileri/geri yürür
+    // ════════════════════════════════════════════════════════════════════════
+    public class SidewalkWalker : MonoBehaviour
     {
-        public Vector3 direction = Vector3.forward;
-        public float speed = 5f;
-        public float destroyDistance = 200f;
-        private Vector3 startPos;
+        public float sidewalkY  = 0.16f;
+        public float speed      = 1.6f;
+        public float rangeZ     = 25f;
+        public int   initialDir = 1;   // +1 = +Z, -1 = -Z
+
+        private Vector3  startPos;
+        private int      dir;
+        private Animator anim;
 
         private void Start()
         {
             startPos = transform.position;
+            dir      = initialDir;
+            anim     = GetComponentInChildren<Animator>();
+            FaceDir();
+            SnapY();
         }
 
         private void Update()
         {
-            transform.position += direction * speed * Time.deltaTime;
-            if (Vector3.Distance(transform.position, startPos) > destroyDistance)
-            {
-                Destroy(gameObject);
-            }
+            transform.position += Vector3.forward * dir * speed * Time.deltaTime;
+            SnapY();
+
+            if (anim != null) anim.speed = speed / 2.0f;
+
+            // Döndür
+            if (dir > 0 && transform.position.z > startPos.z + rangeZ)
+            { dir = -1; FaceDir(); }
+            else if (dir < 0 && transform.position.z < startPos.z - rangeZ)
+            { dir =  1; FaceDir(); }
+        }
+
+        private void FaceDir()
+            => transform.rotation = Quaternion.Euler(0f, dir > 0 ? 0f : 180f, 0f);
+
+        private void SnapY()
+        {
+            Vector3 p = transform.position;
+            p.y = sidewalkY;
+            transform.position = p;
         }
     }
 
-    // Kaldırımda gezinme scripti
-    public class SimpleWanderer : MonoBehaviour
+    // ════════════════════════════════════════════════════════════════════════
+    // YAYA GEÇİDİ YÜRÜYÜŞÜ — soldan sağa (veya tersi) geçiş yapar, bekler, tekrar
+    // ════════════════════════════════════════════════════════════════════════
+    public class CrosswalkWalker : MonoBehaviour
     {
-        public float speed = 2.0f;
-        public float rangeZ = 10f;
-        private Vector3 startPos;
-        private int direction = 1;
-        private Animator animator;
+        public float sidewalkY  = 0.16f;
+        public float startX;
+        public float endX;
+        public float crosswalkZ = -60f;
+        public float speed      = 1.5f;
+        public float waitTime   = 5f;  // İlk başlamadan önce bekleme
+
+        private enum State { Waiting, Walking, Pause }
+        private State  state = State.Waiting;
+        private float  timer;
+        private float  currentStartX;
+        private float  currentEndX;
+        private Animator anim;
 
         private void Start()
         {
-            startPos = transform.position;
-            // Çocuk nesnelerdeki Animator'ı bul (Pedestrian modelinde Animator alt nesnededir)
-            animator = GetComponentInChildren<Animator>();
+            anim  = GetComponentInChildren<Animator>();
+            timer = waitTime;
+
+            // Yaya geçidi Z'sinde başlat
+            Vector3 p = transform.position;
+            p.z = crosswalkZ;
+            p.y = sidewalkY;
+            transform.position = p;
+
+            currentStartX = startX;
+            currentEndX   = endX;
+            FaceTarget();
         }
 
         private void Update()
         {
-            transform.position += Vector3.forward * direction * speed * Time.deltaTime;
+            SnapY();
 
-            if (animator != null)
+            switch (state)
             {
-                // CesiumManWalk varsayılan hızı hızlıdır, yürüme hızına göre animasyon hızını oranlayalım
-                animator.speed = speed / 2.2f;
-            }
+                case State.Waiting:
+                    timer -= Time.deltaTime;
+                    if (anim != null) anim.speed = 0f;
+                    if (timer <= 0f)
+                    {
+                        state = State.Walking;
+                        FaceTarget();
+                    }
+                    break;
 
-            if (direction > 0 && transform.position.z > startPos.z + rangeZ)
-            {
-                direction = -1;
-                transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+                case State.Walking:
+                    if (anim != null) anim.speed = speed / 1.8f;
+
+                    // X ekseninde ilerle
+                    float dir   = Mathf.Sign(currentEndX - transform.position.x);
+                    transform.position += new Vector3(dir * speed * Time.deltaTime, 0f, 0f);
+
+                    // Hedefe ulaştı mı?
+                    bool arrived = dir > 0
+                        ? transform.position.x >= currentEndX
+                        : transform.position.x <= currentEndX;
+
+                    if (arrived)
+                    {
+                        // Pozisyonu kilitle, kısa bekleme sonra geri dön
+                        Vector3 pos = transform.position; pos.x = currentEndX;
+                        transform.position = pos;
+
+                        // Başlangıç/bitiş swap et
+                        (currentStartX, currentEndX) = (currentEndX, currentStartX);
+                        state = State.Pause;
+                        timer = Random.Range(4f, 10f);
+                    }
+                    break;
+
+                case State.Pause:
+                    if (anim != null) anim.speed = 0f;
+                    timer -= Time.deltaTime;
+                    if (timer <= 0f)
+                    {
+                        state = State.Walking;
+                        FaceTarget();
+                    }
+                    break;
             }
-            else if (direction < 0 && transform.position.z < startPos.z - rangeZ)
-            {
-                direction = 1;
-                transform.rotation = Quaternion.identity;
-            }
+        }
+
+        private void FaceTarget()
+        {
+            float dir = currentEndX - transform.position.x;
+            transform.rotation = Quaternion.Euler(0f, dir > 0 ? 90f : -90f, 0f);
+        }
+
+        private void SnapY()
+        {
+            Vector3 p = transform.position;
+            p.y = sidewalkY;
+            p.z = crosswalkZ;  // Z'yi sabit tut — yaya geçidi boyunca yürür
+            transform.position = p;
         }
     }
 }

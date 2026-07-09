@@ -2367,7 +2367,7 @@ RectTransform:
   m_GameObject: {fileID: 157598074}
   m_LocalRotation: {x: -0.000000030908623, y: -0.7071068, z: -0.7071068, w: 0.000000030908623}
   m_LocalPosition: {x: 0, y: 0, z: 0.12}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: -0.05, y: 0.05, z: 0.05}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1818273796}
@@ -14591,7 +14591,7 @@ Transform:
   m_GameObject: {fileID: 565317598}
   serializedVersion: 2
   m_LocalRotation: {x: 0.02617695, y: 0, z: 0, w: 0.99965733}
-  m_LocalPosition: {x: 0, y: 1.1800001, z: -139.5}
+  m_LocalPosition: {x: 0, y: 1.754, z: -139.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16687,6 +16687,18 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: -262507478639431630, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0058
+      objectReference: {fileID: 0}
+    - target: {fileID: -262507478639431630, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.96
+      objectReference: {fileID: 0}
+    - target: {fileID: -262507478639431630, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.613
+      objectReference: {fileID: 0}
     - target: {fileID: -63400509717404500, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
       propertyPath: m_Name
       value: RealCarVisual
@@ -16839,6 +16851,18 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 6740269063782400268, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.00092
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740269063782400268, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740269063782400268, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.551
+      objectReference: {fileID: 0}
     - target: {fileID: 6755907237503066778, guid: e49517c8bbcd42049afd7b443a932e48, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -16947,6 +16971,7 @@ MonoBehaviour:
   carController: {fileID: 0}
   maxRotationAngle: 360
   rotationAxis: {x: 0, y: 1, z: 0}
+  straightAngleOffset: -12
 --- !u!1 &709389509
 GameObject:
   m_ObjectHideFlags: 0
@@ -22724,7 +22749,7 @@ RectTransform:
   m_GameObject: {fileID: 1003631041}
   m_LocalRotation: {x: -0.000000030908623, y: -0.7071068, z: -0.7071068, w: 0.000000030908623}
   m_LocalPosition: {x: 0, y: 0, z: 0.125}
-  m_LocalScale: {x: 0.08, y: 0.08, z: 0.08}
+  m_LocalScale: {x: -0.08, y: 0.08, z: 0.08}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1818273796}
@@ -28147,7 +28172,7 @@ RectTransform:
   m_GameObject: {fileID: 1275470682}
   m_LocalRotation: {x: -0.000000030908623, y: -0.7071068, z: -0.7071068, w: 0.000000030908623}
   m_LocalPosition: {x: 0, y: 0, z: 0.155}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: -0.05, y: 0.05, z: 0.05}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1818273796}
@@ -40028,6 +40053,7 @@ MonoBehaviour:
   carController: {fileID: 0}
   maxRotationAngle: 360
   rotationAxis: {x: 0, y: 0, z: 1}
+  straightAngleOffset: 0
 --- !u!23 &1990321003
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -41829,7 +41855,7 @@ Transform:
   m_GameObject: {fileID: 2095760793}
   serializedVersion: 2
   m_LocalRotation: {x: 0.02617695, y: 0, z: 0, w: 0.99965733}
-  m_LocalPosition: {x: 0, y: 0.38, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0.954, z: 0.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

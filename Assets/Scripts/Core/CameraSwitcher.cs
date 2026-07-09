@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Cinemachine;
+using TrafikParkuru.Vehicle;
 
 namespace TrafikParkuru.Core
 {
@@ -16,7 +17,6 @@ namespace TrafikParkuru.Core
     private InputAction toggleAction;
     private bool isFps;
 
-    // FPS modunda gizlenecek dış gövde parçaları (kamera kliplemesini önlemek için)
     private Renderer windshieldRenderer;
     private Renderer roofRenderer;
     private Renderer pillarsRenderer;
@@ -24,6 +24,9 @@ namespace TrafikParkuru.Core
     private Renderer windshieldWipersRenderer;
     private Renderer windshieldWipersBaseRenderer;
     private Renderer bodyPanelsColor2Renderer;
+
+    // FPS modunda serbest bakış scripti — FPS modunda KAPALI olmalı ki arabanın rotasyonu gereksin
+    private FpsLookAround fpsLookAround;
 
     // Tekerlek görselleri — FPS modunda iç mekana klipleniyor
     private GameObject[] wheelVisuals;
@@ -33,45 +36,66 @@ namespace TrafikParkuru.Core
 
     private void Awake()
     {
+        GameObject carObj = GameObject.Find("Car");
+
+        // ── FPS Kamera kurulumu ──────────────────────────────────────────────
         if (fpsCamera == null)
         {
             GameObject go = GameObject.Find("FpsCamera");
-            if (go != null) fpsCamera = go.GetComponent<CinemachineCamera>();
+            if (go != null)
+                fpsCamera = go.GetComponent<CinemachineCamera>();
         }
+
+        // FpsCamera, Car'ın child'ı olduğu için kendi world transform'unu doğal olarak kullanır.
+        // TrackingTarget ATANMIYOR — Cinemachine TrackingTarget olunca Car root'undan
+        // offset hesaplar ve kamerayı yanlış yüksekliğe taşır.
+
+        // FpsCamera'yı sürücü baş pozisyonuna yerleştir (runtime'da):
+        // Direksiyon simidi world Y ≈ 0.91, Car root Y = 0.80, sürücü başı ≈ 0.20 üstte.
+        // Local Y = (0.91 + 0.20) - 0.80 = 0.31 → direksiyonu ve konsolu tam önde gösterir.
+        // Local Z: direksiyon simidi Z=-139.07, Car Z=-140 → local Z = +0.60 (hafif öne)
+        if (fpsCamera != null && carObj != null)
+        {
+            fpsCamera.transform.localPosition = new Vector3(0f, 0.42f, 0.60f);
+            fpsCamera.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+
+            // Cinemachine Brain'deki Ana Kameranın near clip'ini küçült —
+            // iç mekan detayları görünsün, kırpılma olmasın
+            Camera mainCam = Camera.main;
+            if (mainCam != null) mainCam.nearClipPlane = 0.05f;
+        }
+
+        // ── Chase Kamera ────────────────────────────────────────────────────
         if (chaseCamera == null)
         {
             GameObject go = GameObject.Find("ChaseCamera");
             if (go != null) chaseCamera = go.GetComponent<CinemachineCamera>();
         }
-        if (cockpitParent == null)
+
+        // ── Cockpit parent ──────────────────────────────────────────────────
+        if (cockpitParent == null && carObj != null)
         {
-            GameObject car = GameObject.Find("Car");
-            if (car != null)
-            {
-                Transform cockpit = car.transform.Find("Cockpit");
-                if (cockpit != null) cockpitParent = cockpit.gameObject;
-            }
+            Transform cockpit = carObj.transform.Find("Cockpit");
+            if (cockpit != null) cockpitParent = cockpit.gameObject;
         }
 
         if (inputActions != null)
             toggleAction = inputActions.FindActionMap("Driving", true).FindAction("ToggleCamera", true);
 
-        // Find renderers on RealCarVisual parts that clip in FPS mode
-        GameObject carObj = GameObject.Find("Car");
+        // ── Dış gövde renderer'ları ve diğer referanslar ────────────────────
         if (carObj != null)
         {
             Transform rcv = carObj.transform.Find("RealCarVisual");
             if (rcv != null)
             {
-                windshieldRenderer = FindRenderer(rcv, "BodyWindshield");
-                roofRenderer = FindRenderer(rcv, "BodyRoofPanel");
-                pillarsRenderer = FindRenderer(rcv, "BodyPillars");
-                windshieldGasketRenderer = FindRenderer(rcv, "BodyWindshieldGasket");
-                windshieldWipersRenderer = FindRenderer(rcv, "BodyWindshieldWipers");
+                windshieldRenderer         = FindRenderer(rcv, "BodyWindshield");
+                roofRenderer               = FindRenderer(rcv, "BodyRoofPanel");
+                pillarsRenderer            = FindRenderer(rcv, "BodyPillars");
+                windshieldGasketRenderer   = FindRenderer(rcv, "BodyWindshieldGasket");
+                windshieldWipersRenderer   = FindRenderer(rcv, "BodyWindshieldWipers");
                 windshieldWipersBaseRenderer = FindRenderer(rcv, "BodyWindshieldWipersBase");
-                bodyPanelsColor2Renderer = FindRenderer(rcv, "BodyPanelsColor2");
+                bodyPanelsColor2Renderer   = FindRenderer(rcv, "BodyPanelsColor2");
 
-                // Tekerlek görsellerini bul
                 string[] wheelNames = { "WheelFrontL", "WheelFrontR", "WheelRearL", "WheelRearR" };
                 wheelVisuals = new GameObject[wheelNames.Length];
                 for (int i = 0; i < wheelNames.Length; i++)
@@ -81,14 +105,15 @@ namespace TrafikParkuru.Core
                 }
             }
 
-            // Cockpit altındaki eski Dashboard mesh'i — gerçek model dashboard ile çakışıyor
-            Transform cockpit = carObj.transform.Find("Cockpit");
-            if (cockpit != null)
+            Transform cockpitT = carObj.transform.Find("Cockpit");
+            if (cockpitT != null)
             {
-                Transform dashboard = cockpit.Find("Dashboard");
+                Transform dashboard = cockpitT.Find("Dashboard");
                 if (dashboard != null)
                     cockpitDashboardRenderer = dashboard.GetComponent<Renderer>();
             }
+
+            fpsLookAround = carObj.GetComponentInChildren<FpsLookAround>(true);
         }
 
         isFps = startInFps;
@@ -124,11 +149,17 @@ namespace TrafikParkuru.Core
 
     private void ApplyPriorities()
     {
-        if (fpsCamera != null) fpsCamera.Priority = isFps ? 20 : 10;
-        if (chaseCamera != null) chaseCamera.Priority = isFps ? 10 : 20;
+        // FPS kamerası Follow target'ı = Car (Awake'de set edildi)
+        // En yüksek önceliğe sahip kamera Cinemachine Brain tarafından kullanılır
+        if (fpsCamera   != null) fpsCamera.Priority   = isFps ? 20 : 5;
+        if (chaseCamera != null) chaseCamera.Priority = isFps ? 5  : 20;
+
+        // Chase kamerasini sadece aktif olduğunda render etsin
+        if (chaseCamera != null) chaseCamera.gameObject.SetActive(!isFps);
+
         if (cockpitParent != null) cockpitParent.SetActive(isFps);
 
-        // FPS modunda kameranın kliplemesini önlemek için dış gövde parçalarını gizle
+        // ── Dış gövde görünürlüğü ────────────────────────────────────────────
         bool showExterior = !isFps;
         SetRendererEnabled(windshieldRenderer, showExterior);
         SetRendererEnabled(roofRenderer, showExterior);
@@ -137,11 +168,8 @@ namespace TrafikParkuru.Core
         SetRendererEnabled(windshieldWipersRenderer, showExterior);
         SetRendererEnabled(windshieldWipersBaseRenderer, showExterior);
         SetRendererEnabled(bodyPanelsColor2Renderer, showExterior);
-
-        // Cockpit Dashboard mesh'i FPS modunda gizle (RealCarVisual'deki asıl dashboard ile çakışma)
         SetRendererEnabled(cockpitDashboardRenderer, false);
 
-        // Tekerlek görsellerini FPS modunda gizle (iç mekana klipleniyor)
         if (wheelVisuals != null)
         {
             foreach (var wheel in wheelVisuals)
@@ -154,6 +182,10 @@ namespace TrafikParkuru.Core
                 }
             }
         }
+
+        // FpsLookAround FPS modunda kapalı — araç dönerken kamera arabayı takip etsin
+        if (fpsLookAround != null)
+            fpsLookAround.enabled = false; // Her iki modda da kapalı tutuyoruz
 
         var hud = FindAnyObjectByType<HudController>();
         if (hud != null) hud.SetFpsView(isFps);
