@@ -76,6 +76,7 @@ namespace TrafikParkuru.Stations
             if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
             {
                 isWalking = false;
+                if (animator != null) animator.speed = 0f;
                 Destroy(gameObject, 1f); // 1 saniye sonra yok et
             }
         }
@@ -88,6 +89,7 @@ namespace TrafikParkuru.Stations
             {
                 hitByCar = true;
                 isWalking = false;
+                if (animator != null) animator.speed = 0f;
                 Debug.LogWarning("PedestrianWalker: Yaya araba tarafından ezildi!");
 
                 // Fiziksel etki ekle (fırla)

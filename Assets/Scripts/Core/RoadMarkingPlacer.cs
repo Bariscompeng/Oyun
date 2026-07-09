@@ -100,7 +100,7 @@ namespace TrafikParkuru.Core
                 dash.transform.position = new Vector3(0f, markingY, z + dashLength / 2f);
                 dash.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 dash.transform.localScale = new Vector3(lineWidth, dashLength, 1f);
-                dash.GetComponent<Renderer>().sharedMaterial = yellowMat;
+                dash.GetComponent<Renderer>().sharedMaterial = whiteMat;
 
                 z += dashLength + gapLength;
                 dashIndex++;

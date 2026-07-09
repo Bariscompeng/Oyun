@@ -1,22 +1,22 @@
 --- Scene GameObjects Dump ---
-Total GameObjects found: 479
-- CrosswalkStation | Pos: (0.00, 0.05, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+Total GameObjects found: 481
+- CrosswalkStation | Pos: (0.00, 0.05, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: CrosswalkStation
-        + zebraZ: -60
-        + entryZ: -72
-        + exitZ: -52
+        + zebraZ: -50
+        + entryZ: -62
+        + exitZ: -42
 - FinishCheckerPlane | Pos: (50.00, 0.02, 0.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.20, 1.00, 0.20) | Active: True
 - SpeedLimitSign_Right | Pos: (20.00, 0.00, -5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
   - Pole | Pos: (20.00, 1.25, -5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (0.10, 1.25, 0.10) | Active: True
   - Signboard | Pos: (20.00, 2.50, -5.50) | Rot: (90.00, 270.00, 0.00) | Scale: (0.90, 0.03, 0.90) | Active: True
-  - Text | Pos: (20.07, 2.50, -5.50) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Text_Front | Pos: (19.97, 2.50, -5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       * Component: RectTransform
       * Component: TextMeshPro
           + _SortingLayer: 0
           + _SortingLayerID: 0
           + _SortingOrder: 0
           + m_hasFontAssetChanged: False
-          + m_renderer: Text (UnityEngine.MeshRenderer)
+          + m_renderer: Text_Front (UnityEngine.MeshRenderer)
           + m_maskType: MaskOff
           + m_text: 25
           + m_TextPreprocessor: 
@@ -44,7 +44,7 @@ Total GameObjects found: 479
           + m_enableAutoSizing: False
           + m_fontSizeMin: 18
           + m_fontSizeMax: 72
-          + m_fontStyle: Normal
+          + m_fontStyle: Bold
           + m_HorizontalAlignment: Center
           + m_VerticalAlignment: Middle
           + m_textAlignment: Converted
@@ -80,7 +80,78 @@ Total GameObjects found: 479
           + m_isUsingLegacyAnimationComponent: False
           + m_isVolumetricText: False
           + m_Material: null
-- SpeedZoneStation | Pos: (32.00, 0.00, 0.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Text_Back | Pos: (20.04, 2.50, -5.50) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+      * Component: RectTransform
+      * Component: TextMeshPro
+          + _SortingLayer: 0
+          + _SortingLayerID: 0
+          + _SortingOrder: 0
+          + m_hasFontAssetChanged: False
+          + m_renderer: Text_Back (UnityEngine.MeshRenderer)
+          + m_maskType: MaskOff
+          + m_text: 25
+          + m_TextPreprocessor: 
+          + m_isRightToLeft: False
+          + m_fontAsset: LiberationSans SDF - Fallback (TMPro.TMP_FontAsset)
+          + m_sharedMaterial: LiberationSans SDF Material (UnityEngine.Material)
+          + m_fontSharedMaterials: UnityEngine.Material[]
+          + m_fontMaterial: null
+          + m_fontMaterials: UnityEngine.Material[]
+          + m_fontColor32: RGBA(255, 255, 255, 255)
+          + m_fontColor: RGBA(1.000, 1.000, 1.000, 1.000)
+          + m_enableVertexGradient: False
+          + m_colorMode: FourCornersGradient
+          + m_fontColorGradient: TMPro.VertexGradient
+          + m_fontColorGradientPreset: 
+          + m_spriteAsset: 
+          + m_tintAllSprites: False
+          + m_StyleSheet: 
+          + m_TextStyleHashCode: -1183493901
+          + m_overrideHtmlColors: False
+          + m_faceColor: RGBA(255, 255, 255, 255)
+          + m_fontSize: 4.5
+          + m_fontSizeBase: 4.5
+          + m_fontWeight: Regular
+          + m_enableAutoSizing: False
+          + m_fontSizeMin: 18
+          + m_fontSizeMax: 72
+          + m_fontStyle: Bold
+          + m_HorizontalAlignment: Center
+          + m_VerticalAlignment: Middle
+          + m_textAlignment: Converted
+          + m_characterSpacing: 0
+          + m_characterHorizontalScale: 1
+          + m_wordSpacing: 0
+          + m_lineSpacing: 0
+          + m_lineSpacingMax: 0
+          + m_paragraphSpacing: 0
+          + m_charWidthMaxAdj: 0
+          + m_TextWrappingMode: Normal
+          + m_wordWrappingRatios: 0.4
+          + m_overflowMode: Overflow
+          + m_linkedTextComponent: 
+          + parentLinkedComponent: 
+          + m_enableKerning: False
+          + m_ActiveFontFeatures: System.Collections.Generic.List`1[UnityEngine.TextCore.OTL_FeatureTag]
+          + m_enableExtraPadding: False
+          + checkPaddingRequired: False
+          + m_isRichText: True
+          + m_parseCtrlCharacters: True
+          + m_isOrthographic: False
+          + m_isCullingEnabled: False
+          + m_horizontalMapping: Character
+          + m_verticalMapping: Character
+          + m_uvLineOffset: 0
+          + m_geometrySortingOrder: Normal
+          + m_IsTextObjectScaleStatic: False
+          + m_VertexBufferAutoSizeReduction: False
+          + m_useMaxVisibleDescender: True
+          + m_pageToDisplay: 1
+          + m_margin: (0.00, 0.00, 0.00, 0.00)
+          + m_isUsingLegacyAnimationComponent: False
+          + m_isVolumetricText: False
+          + m_Material: null
+- SpeedZoneStation | Pos: (27.50, 0.00, 0.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: SpeedZoneStation
 - NPC_Spawner | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: NpcSpawner
@@ -685,14 +756,14 @@ areaError: 15
 - SpeedLimitSign_Left | Pos: (20.00, 0.00, 5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
   - Pole | Pos: (20.00, 1.25, 5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (0.10, 1.25, 0.10) | Active: True
   - Signboard | Pos: (20.00, 2.50, 5.50) | Rot: (90.00, 270.00, 0.00) | Scale: (0.90, 0.03, 0.90) | Active: True
-  - Text | Pos: (20.07, 2.50, 5.50) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Text_Front | Pos: (19.97, 2.50, 5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       * Component: RectTransform
       * Component: TextMeshPro
           + _SortingLayer: 0
           + _SortingLayerID: 0
           + _SortingOrder: 0
           + m_hasFontAssetChanged: False
-          + m_renderer: Text (UnityEngine.MeshRenderer)
+          + m_renderer: Text_Front (UnityEngine.MeshRenderer)
           + m_maskType: MaskOff
           + m_text: 25
           + m_TextPreprocessor: 
@@ -720,7 +791,7 @@ areaError: 15
           + m_enableAutoSizing: False
           + m_fontSizeMin: 18
           + m_fontSizeMax: 72
-          + m_fontStyle: Normal
+          + m_fontStyle: Bold
           + m_HorizontalAlignment: Center
           + m_VerticalAlignment: Middle
           + m_textAlignment: Converted
@@ -756,7 +827,79 @@ areaError: 15
           + m_isUsingLegacyAnimationComponent: False
           + m_isVolumetricText: False
           + m_Material: null
-- TestRunner | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Text_Back | Pos: (20.04, 2.50, 5.50) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+      * Component: RectTransform
+      * Component: TextMeshPro
+          + _SortingLayer: 0
+          + _SortingLayerID: 0
+          + _SortingOrder: 0
+          + m_hasFontAssetChanged: False
+          + m_renderer: Text_Back (UnityEngine.MeshRenderer)
+          + m_maskType: MaskOff
+          + m_text: 25
+          + m_TextPreprocessor: 
+          + m_isRightToLeft: False
+          + m_fontAsset: LiberationSans SDF - Fallback (TMPro.TMP_FontAsset)
+          + m_sharedMaterial: LiberationSans SDF Material (UnityEngine.Material)
+          + m_fontSharedMaterials: UnityEngine.Material[]
+          + m_fontMaterial: null
+          + m_fontMaterials: UnityEngine.Material[]
+          + m_fontColor32: RGBA(255, 255, 255, 255)
+          + m_fontColor: RGBA(1.000, 1.000, 1.000, 1.000)
+          + m_enableVertexGradient: False
+          + m_colorMode: FourCornersGradient
+          + m_fontColorGradient: TMPro.VertexGradient
+          + m_fontColorGradientPreset: 
+          + m_spriteAsset: 
+          + m_tintAllSprites: False
+          + m_StyleSheet: 
+          + m_TextStyleHashCode: -1183493901
+          + m_overrideHtmlColors: False
+          + m_faceColor: RGBA(255, 255, 255, 255)
+          + m_fontSize: 4.5
+          + m_fontSizeBase: 4.5
+          + m_fontWeight: Regular
+          + m_enableAutoSizing: False
+          + m_fontSizeMin: 18
+          + m_fontSizeMax: 72
+          + m_fontStyle: Bold
+          + m_HorizontalAlignment: Center
+          + m_VerticalAlignment: Middle
+          + m_textAlignment: Converted
+          + m_characterSpacing: 0
+          + m_characterHorizontalScale: 1
+          + m_wordSpacing: 0
+          + m_lineSpacing: 0
+          + m_lineSpacingMax: 0
+          + m_paragraphSpacing: 0
+          + m_charWidthMaxAdj: 0
+          + m_TextWrappingMode: Normal
+          + m_wordWrappingRatios: 0.4
+          + m_overflowMode: Overflow
+          + m_linkedTextComponent: 
+          + parentLinkedComponent: 
+          + m_enableKerning: False
+          + m_ActiveFontFeatures: System.Collections.Generic.List`1[UnityEngine.TextCore.OTL_FeatureTag]
+          + m_enableExtraPadding: False
+          + checkPaddingRequired: False
+          + m_isRichText: True
+          + m_parseCtrlCharacters: True
+          + m_isOrthographic: False
+          + m_isCullingEnabled: False
+          + m_horizontalMapping: Character
+          + m_verticalMapping: Character
+          + m_uvLineOffset: 0
+          + m_geometrySortingOrder: Normal
+          + m_IsTextObjectScaleStatic: False
+          + m_VertexBufferAutoSizeReduction: False
+          + m_useMaxVisibleDescender: True
+          + m_pageToDisplay: 1
+          + m_margin: (0.00, 0.00, 0.00, 0.00)
+          + m_isUsingLegacyAnimationComponent: False
+          + m_isVolumetricText: False
+          + m_Material: null
+- TestRunner | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: False
+    * Component: IntegrationTest
 - RoadMarkingManager | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: RoadMarkingPlacer
         + road: null
@@ -766,13 +909,13 @@ areaError: 15
         + edgeLineWidth: 0.12
         + whiteMat: null
         + yellowMat: null
-- PedestrianSpawner | Pos: (0.00, 0.00, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+- PedestrianSpawner | Pos: (0.00, 0.00, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: PedestrianSpawner
         + crosswalkStation: CrosswalkStation (TrafikParkuru.Stations.CrosswalkStation)
-        + triggerZ: -90
+        + triggerZ: -80
         + spawnX: -7
         + targetX: 7
-        + crosswalkZ: -60
+        + crosswalkZ: -50
         + walkSpeed: 1.6
         + pedestrianPrefab: Pedestrian (UnityEngine.GameObject)
 - Road | Pos: (0.00, 0.05, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (10.00, 0.10, 300.00) | Active: True
@@ -1074,8 +1217,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 28
-            + m_fontSizeBase: 28
+            + m_fontSize: 20
+            + m_fontSizeBase: 20
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -1138,7 +1281,7 @@ areaError: 15
               + m_TextComponent: Title (TMPro.TextMeshProUGUI)
               + m_materialReferenceIndex: 1
               + m_Material: LiberationSans SDF Material + LiberationSans SDF Atlas 1 (UnityEngine.Material)
-    - RedLightTask | Pos: (41.97, 695.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    - RedLightTask | Pos: (41.97, 691.56, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
         * Component: RectTransform
         * Component: CanvasRenderer
         * Component: TextMeshProUGUI
@@ -1165,8 +1308,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 24
-            + m_fontSizeBase: 24
+            + m_fontSize: 16
+            + m_fontSizeBase: 16
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -1207,7 +1350,7 @@ areaError: 15
             + m_isUsingLegacyAnimationComponent: False
             + m_isVolumetricText: False
             + m_Material: null
-    - CrosswalkTask | Pos: (41.97, 670.58, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    - CrosswalkTask | Pos: (41.97, 663.58, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
         * Component: RectTransform
         * Component: CanvasRenderer
         * Component: TextMeshProUGUI
@@ -1234,8 +1377,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 24
-            + m_fontSizeBase: 24
+            + m_fontSize: 16
+            + m_fontSizeBase: 16
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -1276,7 +1419,7 @@ areaError: 15
             + m_isUsingLegacyAnimationComponent: False
             + m_isVolumetricText: False
             + m_Material: null
-    - TurnTask | Pos: (41.97, 646.10, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    - TurnTask | Pos: (41.97, 635.61, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
         * Component: RectTransform
         * Component: CanvasRenderer
         * Component: TextMeshProUGUI
@@ -1303,8 +1446,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 24
-            + m_fontSizeBase: 24
+            + m_fontSize: 16
+            + m_fontSizeBase: 16
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -1345,7 +1488,7 @@ areaError: 15
             + m_isUsingLegacyAnimationComponent: False
             + m_isVolumetricText: False
             + m_Material: null
-    - SpeedZoneTask | Pos: (41.97, 621.62, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    - SpeedZoneTask | Pos: (41.97, 607.63, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
         * Component: RectTransform
         * Component: CanvasRenderer
         * Component: TextMeshProUGUI
@@ -1372,8 +1515,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 24
-            + m_fontSizeBase: 24
+            + m_fontSize: 16
+            + m_fontSizeBase: 16
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -1414,7 +1557,7 @@ areaError: 15
             + m_isUsingLegacyAnimationComponent: False
             + m_isVolumetricText: False
             + m_Material: null
-      - TMP SubMeshUI [LiberationSans SDF Material + LiberationSans SDF Atlas 1] | Pos: (41.97, 621.62, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+      - TMP SubMeshUI [LiberationSans SDF Material + LiberationSans SDF Atlas 1] | Pos: (41.97, 607.63, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
           * Component: RectTransform
           * Component: LayoutElement
               + m_IgnoreLayout: True
@@ -4140,7 +4283,7 @@ areaError: 15
           + m_UseSpriteMesh: False
           + m_PixelsPerUnitMultiplier: 1
           + m_Material: null
-    - Title | Pos: (1032.24, 723.03, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    - Title | Pos: (1046.23, 723.03, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
         * Component: RectTransform
         * Component: CanvasRenderer
         * Component: TextMeshProUGUI
@@ -4167,8 +4310,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 28
-            + m_fontSizeBase: 28
+            + m_fontSize: 20
+            + m_fontSizeBase: 20
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -4209,7 +4352,7 @@ areaError: 15
             + m_isUsingLegacyAnimationComponent: False
             + m_isVolumetricText: False
             + m_Material: null
-    - ScoreText | Pos: (1032.24, 684.57, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    - ScoreText | Pos: (1046.23, 691.56, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
         * Component: RectTransform
         * Component: CanvasRenderer
         * Component: TextMeshProUGUI
@@ -4236,8 +4379,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 24
-            + m_fontSizeBase: 24
+            + m_fontSize: 16
+            + m_fontSizeBase: 16
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -4278,7 +4421,7 @@ areaError: 15
             + m_isUsingLegacyAnimationComponent: False
             + m_isVolumetricText: False
             + m_Material: null
-    - TimeText | Pos: (1032.24, 649.60, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    - TimeText | Pos: (1046.23, 660.09, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
         * Component: RectTransform
         * Component: CanvasRenderer
         * Component: TextMeshProUGUI
@@ -4305,8 +4448,8 @@ areaError: 15
             + m_TextStyleHashCode: -1183493901
             + m_overrideHtmlColors: False
             + m_faceColor: RGBA(255, 255, 255, 255)
-            + m_fontSize: 24
-            + m_fontSizeBase: 24
+            + m_fontSize: 16
+            + m_fontSizeBase: 16
             + m_fontWeight: Regular
             + m_enableAutoSizing: False
             + m_fontSizeMin: 18
@@ -4662,7 +4805,7 @@ TRAFFIC OK
             + carController: 
             + maxRotationAngle: 360
             + rotationAxis: (0.00, 1.00, 0.00)
-            + straightAngleOffset: -25
+            + straightAngleOffset: -12
       - InteriorSteeringEmblem | Pos: (0.00, 0.91, -139.13) | Rot: (283.93, 92.78, 272.78) | Scale: (1.00, 1.00, 1.00) | Active: True
       - InteriorSteeringWheel04 | Pos: (0.00, 0.89, -139.08) | Rot: (283.93, 92.78, 272.78) | Scale: (1.00, 1.00, 1.00) | Active: True
       - InteriorSteeringWheel01 | Pos: (0.00, 0.91, -139.13) | Rot: (283.93, 92.78, 272.78) | Scale: (1.00, 1.00, 1.00) | Active: True
@@ -5017,10 +5160,10 @@ TRAFFIC OK
 - GameManager | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: ScenarioManager
         + currentStage: RedLight
-- ZebraCrossing | Pos: (0.00, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
-  - Stripe1 | Pos: (-3.00, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
-  - Stripe2 | Pos: (-1.50, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
-  - Stripe3 | Pos: (0.00, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
-  - Stripe4 | Pos: (1.50, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
-  - Stripe5 | Pos: (3.00, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+- ZebraCrossing | Pos: (0.00, 0.11, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Stripe1 | Pos: (-3.00, 0.11, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe2 | Pos: (-1.50, 0.11, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe3 | Pos: (0.00, 0.11, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe4 | Pos: (1.50, 0.11, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe5 | Pos: (3.00, 0.11, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
 - Ground | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True

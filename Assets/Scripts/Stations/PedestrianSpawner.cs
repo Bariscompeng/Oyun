@@ -11,7 +11,7 @@ namespace TrafikParkuru.Stations
         [SerializeField] private float triggerZ = -90f; // Tetiklenme Z konumu
         [SerializeField] private float spawnX = -7f;
         [SerializeField] private float targetX = 7f;
-        [SerializeField] private float crosswalkZ = -60f;
+        [SerializeField] private float crosswalkZ = -50f;
         [SerializeField] private float walkSpeed = 1.6f;
 
         [Header("Yaya Prefabı (Opsiyonel)")]
@@ -106,6 +106,13 @@ namespace TrafikParkuru.Stations
         private void ApplyPedestrianMaterials(GameObject ped)
         {
             if (ped == null) return;
+
+            // If this is the textured Pedestrian prefab (CesiumMan), preserve its original materials and textures.
+            if (ped.name.StartsWith("Pedestrian"))
+            {
+                return;
+            }
+
             Renderer[] renderers = ped.GetComponentsInChildren<Renderer>(true);
             Color clothesColor = new Color[]
             {

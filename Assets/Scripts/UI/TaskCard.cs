@@ -60,7 +60,7 @@ namespace TrafikParkuru.UI
             if (stageTexts.ContainsKey(stage) && stageTexts[stage] != null)
             {
                 string baseText = GetBaseTextForStage(stage);
-                stageTexts[stage].text = $"<s>{baseText} (+{score} Puan)</s>";
+                stageTexts[stage].text = $"<color=#22C55E>[v]</color> <s>{baseText} (+{score} Puan)</s>";
                 stageTexts[stage].color = completedColor;
             }
         }
@@ -75,17 +75,18 @@ namespace TrafikParkuru.UI
                 {
                     kvp.Value.color = activeColor;
                     kvp.Value.fontStyle = FontStyles.Bold;
-                    kvp.Value.text = $"> {GetBaseTextForStage(kvp.Key)}";
+                    kvp.Value.text = $"<color=#EAB308>&gt;</color> <b>{GetBaseTextForStage(kvp.Key)}</b>";
                 }
                 else if (kvp.Key < activeStage)
                 {
-                    // Zaten tamamlanmıs (üstü çizili durum OnStageCompleted ile yapılıyor)
+                    kvp.Value.color = completedColor;
+                    kvp.Value.text = $"<color=#22C55E>[v]</color> <s>{GetBaseTextForStage(kvp.Key)}</s>";
                 }
                 else
                 {
                     kvp.Value.color = pendingColor;
                     kvp.Value.fontStyle = FontStyles.Normal;
-                    kvp.Value.text = GetBaseTextForStage(kvp.Key);
+                    kvp.Value.text = $"<color=#9CA3AF>[ ]</color> {GetBaseTextForStage(kvp.Key)}";
                 }
             }
         }

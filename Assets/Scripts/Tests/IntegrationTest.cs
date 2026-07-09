@@ -37,7 +37,7 @@ namespace TrafikParkuru.Tests
 
             // --- 1. İSTASYON: KIRMIZI IŞIK ---
             Debug.Log("1. İstasyon: Kırmızı Işık bölgesine gidiliyor...");
-            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, -108f), 15f));
+            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, -78f), 15f));
             yield return new WaitForSeconds(0.5f);
 
             Debug.Log("Işıkta bekleniyor (Kırmızı ışığın yeşile dönmesi bekleniyor)...");
@@ -54,7 +54,8 @@ namespace TrafikParkuru.Tests
 
             // --- 2. İSTASYON: YAYA GEÇİDİ ---
             Debug.Log("2. İstasyon: Yaya geçidi durma çizgisine gidiliyor...");
-            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, -66f), 15f));
+            // Yaya geçidi Z: -50'ye taşındığı için, durma çizgisi yaklaşık Z = -56f
+            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, -56f), 15f));
             
             // Yayanın karşıdan karşıya geçmesi ve bizim durarak yol vermemiz bekleniyor
             Debug.Log("Yayanın karşıdan karşıya geçmesi bekleniyor...");
@@ -82,7 +83,8 @@ namespace TrafikParkuru.Tests
             }
 
             Debug.Log("Yaya geçidi tamamlanıyor, bölgeden çıkılıyor...");
-            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, -48f), 15f));
+            // Yaya geçidi Z = -50'den geçilip Z = -38'e ilerleniyor
+            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, -38f), 15f));
             yield return new WaitForSeconds(0.5f);
 
             // --- 3. İSTASYON: SAĞA DÖNÜŞ SİNYALİ ---
@@ -100,8 +102,17 @@ namespace TrafikParkuru.Tests
             // En az 1 saniye sinyal verilmesi gerekiyor
             yield return new WaitForSeconds(1.5f);
 
-            Debug.Log("Kavşaktan geçilerek sinyal bölgesinden çıkılıyor...");
-            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, 10f), 15f));
+            Debug.Log("Kavşak dönüş noktasına ilerleniyor...");
+            // Kavşak merkezi Z = -1.8f konumundadır (SideRoad sağ şerit)
+            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, -1.8f), 10f));
+            
+            Debug.Log("Araç sağa (East) döndürülüyor...");
+            car.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+            carRb.rotation = Quaternion.Euler(0f, 90f, 0f);
+            yield return new WaitForFixedUpdate();
+
+            Debug.Log("Yan yola giriş yapılıyor...");
+            yield return StartCoroutine(MoveCarThrough(new Vector3(10f, 0.5f, -1.8f), 10f));
             yield return new WaitForSeconds(0.1f);
 
             if (signal != null)
@@ -110,15 +121,20 @@ namespace TrafikParkuru.Tests
             }
             yield return new WaitForSeconds(0.4f);
 
-            // --- 4. İSTASYON: HIZ SINIRI (10 km/s) ---
+            // --- 4. İSTASYON: HIZ SINIRI (25 km/s) ---
             Debug.Log("4. İstasyon: Hız sınırı bölgesine yaklaşıyor...");
-            // SpeedZone Z: 60'ta başlar, Z: 55'e kadar hızlı gidip, Z: 55'te yavaşlıyoruz.
-            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, 55f), 15f));
+            // SpeedZone X = 15f ila 40f arasındadır. Girmeden önce yavaşlıyoruz.
+            // X = 10f'ten X = 14f'e kadar 2.22 m/s (8 km/s) hızla giderek bölgeye yavaş giriyoruz.
+            yield return StartCoroutine(MoveCarThrough(new Vector3(14f, 0.5f, -1.8f), 2.22f));
             
-            // Hız sınırı bölgesinde 8 km/s (<=13 km/s tam puan) hız simüle ederek bitiş çizgisine kadar ilerleyelim
-            // 8 km/s = 2.22 m/s. Bitiş çizgisi Z: 120'dedir. SpeedZone da Z: 120'de biter.
+            // Hız sınırı bölgesi içinde (X = 15f'ten X = 40f'e) yavaşça sürülüyor...
             Debug.Log("Hız sınırı bölgesi içinde yavaşça sürülüyor...");
-            yield return StartCoroutine(MoveCarThrough(new Vector3(0f, 0.5f, 121f), 2.22f));
+            yield return StartCoroutine(MoveCarThrough(new Vector3(40f, 0.5f, -1.8f), 2.22f));
+            yield return new WaitForSeconds(0.5f);
+
+            Debug.Log("Bitiş çizgisine ilerleniyor...");
+            // FinishTrigger X = 50'dedir.
+            yield return StartCoroutine(MoveCarThrough(new Vector3(51f, 0.5f, -1.8f), 15f));
             yield return new WaitForSeconds(1.0f);
 
             Debug.Log("--- ENTEGRASYON TESTİ TAMAMLANDI ---");

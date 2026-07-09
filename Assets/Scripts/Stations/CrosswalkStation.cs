@@ -7,9 +7,9 @@ namespace TrafikParkuru.Stations
     public class CrosswalkStation : MonoBehaviour
     {
         [Header("İstasyon Sınırları")]
-        [SerializeField] private float zebraZ = -60f;
-        [SerializeField] private float entryZ = -72f;
-        [SerializeField] private float exitZ = -52f;
+        [SerializeField] private float zebraZ = -50f;
+        [SerializeField] private float entryZ = -62f;
+        [SerializeField] private float exitZ = -42f;
 
         private PedestrianWalker activePedestrian;
         private CarController playerCar;

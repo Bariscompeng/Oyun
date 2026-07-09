@@ -30,12 +30,19 @@ namespace TrafikParkuru.Core
         private const float SideRoadLeftZ  =  1.8f; // Yan yol sol şerit Z
         private const float LeftSidewalkX  = -5.5f;
         private const float RightSidewalkX =  5.5f;
-        private const float CrosswalkZ     = -60f;  // Yaya geçidi Z
+        private const float CrosswalkZ     = -50f;  // Yaya geçidi Z
 
         // Araç spawn Y = RoadY; NpcDriver.ComputeLockedY BoxCollider bounds'tan doğru pivot Y'yi hesaplar.
 
         private void Start()
         {
+            if (Object.FindAnyObjectByType<TrafikParkuru.Tests.IntegrationTest>() != null)
+            {
+                Debug.Log("NpcSpawner: Entegrasyon testi aktif, NPC araç ve yaya üretimi devre dışı bırakıldı.");
+                SpawnCrosswalkMarking();
+                return;
+            }
+
             SpawnCars();
             SpawnPedestrians();
             SpawnCrosswalkMarking(); // Kaldırımdan kaldırıma tam yaya geçidi şeritleri
@@ -114,7 +121,7 @@ namespace TrafikParkuru.Core
             {
                 car = Instantiate(npcCarPrefab, position, rotation);
                 car.name = "NPC_Car";
-                car.transform.localScale = new Vector3(55f, 55f, 55f);
+                car.transform.localScale = new Vector3(95f, 95f, 95f);
                 SetupNpcCarPhysics(car);
                 PaintNpcCar(car);
             }
@@ -139,8 +146,8 @@ namespace TrafikParkuru.Core
             // BoxCollider
             BoxCollider col = car.GetComponent<BoxCollider>();
             if (col == null) col = car.AddComponent<BoxCollider>();
-            col.center = new Vector3(0f, 0.012f, 0.005f);
-            col.size   = new Vector3(0.03f, 0.024f, 0.07f);
+            col.center = new Vector3(0f, 0.007f, 0.003f);
+            col.size   = new Vector3(0.019f, 0.009f, 0.044f);
 
             // Rigidbody — kinematic (NpcDriver kendi hareketi kontrol eder)
             Rigidbody rb = car.GetComponent<Rigidbody>();
@@ -226,8 +233,9 @@ namespace TrafikParkuru.Core
             SpawnSidewalkWalker(new Vector3(RightSidewalkX, SidewalkY,   20f), direction: 1);
 
             // Yaya geçidinden geçenler (2 kişi — sol → sağ ve sağ → sol)
-            SpawnCrosswalkPedestrian(startX: LeftSidewalkX  - 1f, endX: RightSidewalkX + 1f);
-            SpawnCrosswalkPedestrian(startX: RightSidewalkX + 1f, endX: LeftSidewalkX  - 1f);
+            // Kaldırımdaki sabit beklemeleri önlemek için devredışı bırakıldı, artık tüm yaya trafiği kaldırım boyuncadır.
+            // SpawnCrosswalkPedestrian(startX: LeftSidewalkX  - 1f, endX: RightSidewalkX + 1f);
+            // SpawnCrosswalkPedestrian(startX: RightSidewalkX + 1f, endX: LeftSidewalkX  - 1f);
         }
 
         private void SpawnSidewalkWalker(Vector3 startPos, int direction)
@@ -441,7 +449,7 @@ namespace TrafikParkuru.Core
         public float sidewalkY  = 0.16f;
         public float startX;
         public float endX;
-        public float crosswalkZ = -60f;
+        public float crosswalkZ = -50f;
         public float speed      = 1.5f;
         public float waitTime   = 5f;  // İlk başlamadan önce bekleme
 

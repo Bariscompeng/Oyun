@@ -117,14 +117,50 @@ namespace TrafikParkuru.Core
             }
             Vector3 dir = toTarget.normalized;
 
-            // 2. Engel tespiti
+            // 2. Engel ve Trafik Kuralları tespiti
             bool  shouldStop = false;
             float slowFactor = 1f;
 
-            Vector3 rayOrigin = transform.position + Vector3.up * 0.5f;
-            if (Physics.Raycast(rayOrigin, transform.forward, out RaycastHit hit, detectionDistance))
+            // Kırmızı/Sarı Işık tespiti (Sağ şeritte +Z yönünde gidenler için)
+            if (transform.forward.z > 0.5f && transform.position.z > -75f && transform.position.z < -64f)
             {
-                if (hit.collider.attachedRigidbody != null)
+                var light = Object.FindAnyObjectByType<TrafikParkuru.Stations.TrafficLightController>();
+                if (light != null && (light.CurrentState == TrafikParkuru.Stations.TrafficLightState.Red || 
+                                     light.CurrentState == TrafikParkuru.Stations.TrafficLightState.RedYellow))
+                {
+                    shouldStop = true;
+                }
+            }
+
+            // Yaya geçidindeki yaya tespiti
+            if (!shouldStop)
+            {
+                var walkers = Object.FindObjectsByType<TrafikParkuru.Stations.PedestrianWalker>(FindObjectsSortMode.None);
+                foreach (var w in walkers)
+                {
+                    if (w != null && w.IsOnCrosswalk)
+                    {
+                        float distZ = Mathf.Abs(transform.position.z - -50f);
+                        if (distZ < 15f)
+                        {
+                            bool approaching = (transform.forward.z > 0.5f && transform.position.z < -50f) ||
+                                               (transform.forward.z < -0.5f && transform.position.z > -50f);
+                            if (approaching)
+                            {
+                                shouldStop = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Raycast ile önündeki aracı/rigidbody tespiti
+            Vector3 rayOrigin = transform.position + Vector3.up * 0.5f;
+            if (!shouldStop && Physics.Raycast(rayOrigin, transform.forward, out RaycastHit hit, detectionDistance))
+            {
+                // Rigidbody'li araç veya player tespiti
+                if (hit.collider.attachedRigidbody != null || hit.collider.CompareTag("Player") || hit.collider.name.Contains("NPC_Car"))
                 {
                     if (hit.distance < stopDistance) shouldStop = true;
                     else slowFactor = Mathf.Clamp01(
@@ -132,7 +168,7 @@ namespace TrafikParkuru.Core
                 }
             }
 
-            // Oyuncu tespiti
+            // Oyuncu tespiti (Açı ve mesafe bazlı - raycast dışı durumlar için)
             if (!shouldStop && playerTransform != null)
             {
                 Vector3 toP = playerTransform.position - transform.position;
