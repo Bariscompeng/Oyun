@@ -73,14 +73,40 @@ namespace TrafikParkuru.Core
         {
             if (waypoints == null || waypoints.Length == 0) return;
             float minDist = float.MaxValue;
-            int   closest = 0;
+            int closest = -1;
+
             for (int i = 0; i < waypoints.Length; i++)
             {
-                float d = Vector2.Distance(
-                    new Vector2(transform.position.x, transform.position.z),
-                    new Vector2(waypoints[i].x,       waypoints[i].z));
-                if (d < minDist) { minDist = d; closest = i; }
+                Vector3 toWaypoint = waypoints[i] - transform.position;
+                // Sadece araç yönünde (önünde) olan waypoint'leri seç (toleranslı)
+                float dot = Vector3.Dot(toWaypoint.normalized, transform.forward);
+                if (dot > 0.1f)
+                {
+                    float d = Vector2.Distance(
+                        new Vector2(transform.position.x, transform.position.z),
+                        new Vector2(waypoints[i].x,       waypoints[i].z));
+                    if (d < minDist)
+                    {
+                        minDist = d;
+                        closest = i;
+                    }
+                }
             }
+
+            // Eğer önünde hiç waypoint bulunamazsa, fallback olarak en yakındakini seç
+            if (closest == -1)
+            {
+                minDist = float.MaxValue;
+                closest = 0;
+                for (int i = 0; i < waypoints.Length; i++)
+                {
+                    float d = Vector2.Distance(
+                        new Vector2(transform.position.x, transform.position.z),
+                        new Vector2(waypoints[i].x,       waypoints[i].z));
+                    if (d < minDist) { minDist = d; closest = i; }
+                }
+            }
+
             currentWaypointIndex = closest;
         }
 

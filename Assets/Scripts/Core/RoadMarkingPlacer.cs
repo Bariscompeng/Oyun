@@ -110,8 +110,11 @@ namespace TrafikParkuru.Core
             float edgeOffset = roadHalfWidth - 0.3f; // kenardan biraz içeride
             CreateSolidLine("LeftEdgeLine", parent.transform, -edgeOffset, whiteMat);
 
-            // 3. Sağ kenar çizgisi (sürekli beyaz)
-            CreateSolidLine("RightEdgeLine", parent.transform, edgeOffset, whiteMat);
+            // 3. Sağ kenar çizgisi (sürekli beyaz) — kavşaklarda boşluk bırakılarak 3 parça halinde
+            // Kavşak 1: Z = -5..5  |  Kavşak 2: Z = 25..35
+            CreateSolidLineSegment("RightEdgeLine_Part1", parent.transform, edgeOffset, roadStartZ, -5f, whiteMat);
+            CreateSolidLineSegment("RightEdgeLine_Part2", parent.transform, edgeOffset, 5f, 25f, whiteMat);
+            CreateSolidLineSegment("RightEdgeLine_Part3", parent.transform, edgeOffset, 35f, roadEndZ, whiteMat);
         }
 
         private void CreateSolidLine(string name, Transform parent, float xPos, Material mat)
@@ -123,6 +126,19 @@ namespace TrafikParkuru.Core
             line.transform.position = new Vector3(xPos, markingY, centerZ);
             line.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
             line.transform.localScale = new Vector3(edgeLineWidth, totalLength, 1f);
+            line.GetComponent<Renderer>().sharedMaterial = mat;
+        }
+
+        private void CreateSolidLineSegment(string name, Transform parent, float xPos, float startZ, float endZ, Material mat)
+        {
+            float length = endZ - startZ;
+            if (length <= 0f) return;
+            float centerZ = (startZ + endZ) / 2f;
+
+            GameObject line = CreateQuad(name, parent);
+            line.transform.position = new Vector3(xPos, markingY, centerZ);
+            line.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            line.transform.localScale = new Vector3(edgeLineWidth, length, 1f);
             line.GetComponent<Renderer>().sharedMaterial = mat;
         }
 

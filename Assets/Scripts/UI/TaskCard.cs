@@ -18,18 +18,8 @@ namespace TrafikParkuru.UI
         [SerializeField] private Color completedColor = Color.green;
         [SerializeField] private Color pendingColor = Color.gray;
 
-        private Dictionary<GameStage, TMP_Text> stageTexts;
-
         private void Start()
         {
-            stageTexts = new Dictionary<GameStage, TMP_Text>
-            {
-                { GameStage.RedLight, redLightText },
-                { GameStage.Crosswalk, crosswalkText },
-                { GameStage.Turn, turnText },
-                { GameStage.SpeedZone, speedZoneText }
-            };
-
             // ScenarioManager olaylarına abone ol
             if (ScenarioManager.Instance != null)
             {
@@ -57,55 +47,94 @@ namespace TrafikParkuru.UI
 
         private void OnStageCompleted(GameStage stage, int score, string note)
         {
-            if (stageTexts.ContainsKey(stage) && stageTexts[stage] != null)
+            if (ScenarioManager.Instance != null)
             {
-                string baseText = GetBaseTextForStage(stage);
-                stageTexts[stage].text = $"<color=#22C55E>[v]</color> <s>{baseText} (+{score} Puan)</s>";
-                stageTexts[stage].color = completedColor;
+                UpdateCardVisuals(ScenarioManager.Instance.CurrentStage);
             }
         }
 
         private void UpdateCardVisuals(GameStage activeStage)
         {
-            foreach (var kvp in stageTexts)
-            {
-                if (kvp.Value == null) continue;
+            if (redLightText == null || crosswalkText == null || turnText == null || speedZoneText == null) return;
 
-                if (kvp.Key == activeStage)
-                {
-                    kvp.Value.color = activeColor;
-                    kvp.Value.fontStyle = FontStyles.Bold;
-                    kvp.Value.text = $"<color=#EAB308>&gt;</color> <b>{GetBaseTextForStage(kvp.Key)}</b>";
-                }
-                else if (kvp.Key < activeStage)
-                {
-                    kvp.Value.color = completedColor;
-                    kvp.Value.text = $"<color=#22C55E>[v]</color> <s>{GetBaseTextForStage(kvp.Key)}</s>";
-                }
-                else
-                {
-                    kvp.Value.color = pendingColor;
-                    kvp.Value.fontStyle = FontStyles.Normal;
-                    kvp.Value.text = $"<color=#9CA3AF>[ ]</color> {GetBaseTextForStage(kvp.Key)}";
-                }
+            // 1. Kırmızı Işık
+            if (activeStage == GameStage.RedLight)
+            {
+                SetActiveStyle(redLightText, "Kırmızı Işıkta Dur!");
+            }
+            else
+            {
+                SetCompletedStyle(redLightText, "Kırmızı Işıkta Dur!", ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.RedLight) : 20);
+            }
+
+            // 2. Yaya Geçitleri
+            if (activeStage == GameStage.Crosswalk)
+            {
+                SetActiveStyle(crosswalkText, "1. Yaya Geçidinde Yol Ver!");
+            }
+            else if (activeStage == GameStage.Crosswalk2)
+            {
+                SetActiveStyle(crosswalkText, "2. Yaya Geçidinde Yol Ver!");
+            }
+            else if (activeStage < GameStage.Crosswalk)
+            {
+                SetPendingStyle(crosswalkText, "Yaya Geçitlerinde Yol Ver!");
+            }
+            else
+            {
+                int score1 = ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk) : 20;
+                int score2 = ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk2) : 20;
+                SetCompletedStyle(crosswalkText, "Yaya Geçitlerinde Yol Ver!", score1 + score2);
+            }
+
+            // 3. Sağa Dönüş
+            if (activeStage == GameStage.Turn)
+            {
+                SetActiveStyle(turnText, "Kavşakta Sağa Sinyal Ver!");
+            }
+            else if (activeStage < GameStage.Turn)
+            {
+                SetPendingStyle(turnText, "Kavşakta Sağa Sinyal Ver!");
+            }
+            else
+            {
+                SetCompletedStyle(turnText, "Kavşakta Sağa Sinyal Ver!", ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.Turn) : 20);
+            }
+
+            // 4. Hız Sınırı
+            if (activeStage == GameStage.SpeedZone)
+            {
+                SetActiveStyle(speedZoneText, "Hız Sınırına Uy! (Maks 25 km/s)");
+            }
+            else if (activeStage < GameStage.SpeedZone)
+            {
+                SetPendingStyle(speedZoneText, "Hız Sınırına Uy! (Maks 25 km/s)");
+            }
+            else
+            {
+                SetCompletedStyle(speedZoneText, "Hız Sınırına Uy! (Maks 25 km/s)", ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.SpeedZone) : 20);
             }
         }
 
-        private string GetBaseTextForStage(GameStage stage)
+        private void SetActiveStyle(TMP_Text txt, string text)
         {
-            switch (stage)
-            {
-                case GameStage.RedLight:
-                    return "Kırmızı Işıkta Dur!";
-                case GameStage.Crosswalk:
-                    return "Yaya Geçidinde Yol Ver!";
-                case GameStage.Turn:
-                    return "Kavşakta Sağa Sinyal Ver!";
-                case GameStage.SpeedZone:
-                    return "Hız Sınırına Uy! (Maks 25 km/s)";
-                default:
-                    return "";
-            }
+            txt.color = activeColor;
+            txt.fontStyle = FontStyles.Bold;
+            txt.text = $"<color=#EAB308>&gt;</color> <b>{text}</b>";
+        }
+
+        private void SetCompletedStyle(TMP_Text txt, string text, int score)
+        {
+            txt.color = completedColor;
+            txt.fontStyle = FontStyles.Normal;
+            txt.text = $"<color=#22C55E>[v]</color> <s>{text} (+{score} Puan)</s>";
+        }
+
+        private void SetPendingStyle(TMP_Text txt, string text)
+        {
+            txt.color = pendingColor;
+            txt.fontStyle = FontStyles.Normal;
+            txt.text = $"<color=#9CA3AF>[ ]</color> {text}";
         }
     }
 }

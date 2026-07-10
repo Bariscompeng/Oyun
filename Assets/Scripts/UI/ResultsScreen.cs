@@ -74,7 +74,16 @@ namespace TrafikParkuru.UI
 
             // Istasyon detaylari
             SetStageDetail(GameStage.RedLight, redLightDetailText, "Kırmızı Işık");
-            SetStageDetail(GameStage.Crosswalk, crosswalkDetailText, "Yaya Geçidi");
+            
+            if (crosswalkDetailText != null)
+            {
+                int score1 = ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk);
+                string note1 = ScenarioManager.Instance.GetStageNote(GameStage.Crosswalk);
+                int score2 = ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk2);
+                string note2 = ScenarioManager.Instance.GetStageNote(GameStage.Crosswalk2);
+                crosswalkDetailText.text = $"<b>Yaya Geçitleri:</b> {score1 + score2}/40 Puan\n<size=75%>1. {note1}\n2. {note2}</size>";
+            }
+
             SetStageDetail(GameStage.Turn, turnDetailText, "Sağa Dönüş Sinyali");
             SetStageDetail(GameStage.SpeedZone, speedZoneDetailText, "Hız Sınırı");
 
@@ -87,7 +96,7 @@ namespace TrafikParkuru.UI
             if (textComponent == null) return;
             int score = ScenarioManager.Instance.GetStageScore(stage);
             string note = ScenarioManager.Instance.GetStageNote(stage);
-            textComponent.text = $"<b>{stageName}:</b> {score}/25 Puan\n<size=85%>{note}</size>";
+            textComponent.text = $"<b>{stageName}:</b> {score}/20 Puan\n<size=85%>{note}</size>";
         }
 
         private void SaveAndShowLeaderboard(int newScore, float newTime)

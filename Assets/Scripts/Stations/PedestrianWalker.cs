@@ -19,8 +19,12 @@ namespace TrafikParkuru.Stations
             get
             {
                 if (hitByCar) return false;
-                // Yol genisligi X: -5 ile X: 5 arasidir. 
-                // Yaya bu sınırlar içindeyken yaya geçidinde sayılır.
+                
+                if (station != null && station.UseXAxis)
+                {
+                    return transform.position.z > 25.5f && transform.position.z < 34.5f;
+                }
+                
                 return transform.position.x > -5.5f && transform.position.x < 5.5f;
             }
         }

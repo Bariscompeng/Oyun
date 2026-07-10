@@ -58,7 +58,7 @@ namespace TrafikParkuru.Stations
 
             if (maxSpeedInZoneKmh <= 30.0f)
             {
-                score = 25;
+                score = 20;
                 note = $"Tebrikler! Hız sınırına uyarak bölgedeki maksimum hızınızı {maxSpeedInZoneKmh:F1} km/s'te tuttunuz.";
             }
             else if (maxSpeedInZoneKmh <= 40.0f)

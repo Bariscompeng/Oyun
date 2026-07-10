@@ -8,11 +8,12 @@ namespace TrafikParkuru.Stations
         [SerializeField] private CrosswalkStation crosswalkStation;
 
         [Header("Spawn Parametreleri")]
-        [SerializeField] private float triggerZ = -90f; // Tetiklenme Z konumu
+        [SerializeField] private float triggerZ = -90f; // Tetiklenme Z konumu (veya useXAxis ise X konumu)
         [SerializeField] private float spawnX = -7f;
         [SerializeField] private float targetX = 7f;
-        [SerializeField] private float crosswalkZ = -50f;
+        [SerializeField] private float crosswalkZ = -50f; // Yaya geçidi Z konumu (veya useXAxis ise X konumu)
         [SerializeField] private float walkSpeed = 1.6f;
+        [SerializeField] private bool useXAxis = false;
 
         [Header("Yaya Prefabı (Opsiyonel)")]
         [SerializeField] private GameObject pedestrianPrefab;
@@ -39,10 +40,21 @@ namespace TrafikParkuru.Stations
         {
             if (hasSpawned || playerTransform == null) return;
 
-            // Oyuncu tetik Z noktasını gectiyse yayayı spawn et
-            if (playerTransform.position.z >= triggerZ && playerTransform.position.z < crosswalkZ)
+            if (useXAxis)
             {
-                SpawnPedestrian();
+                // E-W yolunda oyuncu doğudan batıya (X=50f -> 0f) geldiği için tetikleme koşulu
+                if (playerTransform.position.x <= triggerZ && playerTransform.position.x > crosswalkZ)
+                {
+                    SpawnPedestrian();
+                }
+            }
+            else
+            {
+                // Oyuncu tetik Z noktasını gectiyse yayayı spawn et
+                if (playerTransform.position.z >= triggerZ && playerTransform.position.z < crosswalkZ)
+                {
+                    SpawnPedestrian();
+                }
             }
         }
 
@@ -51,8 +63,8 @@ namespace TrafikParkuru.Stations
             hasSpawned = true;
             Debug.Log("PedestrianSpawner: Yaya üretiliyor...");
 
-            Vector3 spawnPosition = new Vector3(spawnX, 0.05f, crosswalkZ);
-            Vector3 targetPosition = new Vector3(targetX, 0.05f, crosswalkZ);
+            Vector3 spawnPosition = useXAxis ? new Vector3(crosswalkZ, 0.05f, spawnX) : new Vector3(spawnX, 0.05f, crosswalkZ);
+            Vector3 targetPosition = useXAxis ? new Vector3(crosswalkZ, 0.05f, targetX) : new Vector3(targetX, 0.05f, crosswalkZ);
 
             GameObject pedestrianGo;
 

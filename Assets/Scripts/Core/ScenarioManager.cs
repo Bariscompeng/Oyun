@@ -8,6 +8,7 @@ namespace TrafikParkuru.Core
     {
         RedLight,
         Crosswalk,
+        Crosswalk2,
         Turn,
         SpeedZone,
         Finish

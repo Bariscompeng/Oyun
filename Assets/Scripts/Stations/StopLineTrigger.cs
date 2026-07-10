@@ -44,7 +44,7 @@ namespace TrafikParkuru.Stations
             switch (lightController.CurrentState)
             {
                 case TrafficLightState.Green:
-                    score = 25;
+                    score = 20;
                     note = "Kurallara uygun şekilde bekleyip yeşil ışıkta geçtiniz.";
                     break;
                 case TrafficLightState.RedYellow:

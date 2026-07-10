@@ -10,6 +10,10 @@ namespace TrafikParkuru.Stations
         [SerializeField] private float zebraZ = -50f;
         [SerializeField] private float entryZ = -62f;
         [SerializeField] private float exitZ = -42f;
+        [SerializeField] private GameStage stageToComplete = GameStage.Crosswalk;
+        [SerializeField] private bool useXAxis = false;
+
+        public bool UseXAxis => useXAxis;
 
         private PedestrianWalker activePedestrian;
         private CarController playerCar;
@@ -30,7 +34,7 @@ namespace TrafikParkuru.Stations
             hitPedestrian = true;
             
             // Genel ceza uygula
-            ScenarioManager.Instance.AddPenalty(-25, "Yaya geçidinde yayaya çarpıldı!");
+            ScenarioManager.Instance.AddPenalty(-20, "Yaya geçidinde yayaya çarpıldı!");
             
             // Istasyonu 0 puan ile bitir
             CompleteStation(0, "Yaya geçidindeki yayaya çarptınız.");
@@ -64,13 +68,15 @@ namespace TrafikParkuru.Stations
         {
             if (isCompleted || playerCar == null || hitPedestrian) return;
 
-            float carZ = playerCar.transform.position.z;
+            float carVal = useXAxis ? playerCar.transform.position.x : playerCar.transform.position.z;
+            float zebraVal = zebraZ;
 
             // Yaya yoldayken aracin durumunu izle
             if (activePedestrian != null && activePedestrian.IsOnCrosswalk)
             {
                 // Oyuncu durma cizgisinden once durdu mu? (Zebra crossing Z: -60, durma cizgisi yaklasik Z: -63)
-                if (carZ < zebraZ - 2.5f)
+                bool isBeforeLine = useXAxis ? (carVal > zebraVal + 2.5f) : (carVal < zebraVal - 2.5f);
+                if (isBeforeLine)
                 {
                     if (playerCar.SpeedMs < 0.3f)
                     {
@@ -80,7 +86,7 @@ namespace TrafikParkuru.Stations
                 }
                 
                 // Oyuncu yaya yoldayken yaya gecidine girdi mi?
-                if (carZ >= zebraZ - 2.5f && carZ <= zebraZ + 2.5f)
+                if (carVal >= zebraVal - 2.5f && carVal <= zebraVal + 2.5f)
                 {
                     if (playerCar.SpeedMs > 0.5f)
                     {
@@ -96,7 +102,7 @@ namespace TrafikParkuru.Stations
         {
             if (isCompleted) return;
 
-            int score = 25;
+            int score = 20;
             string note = "Yaya geçidinden kurallara uygun şekilde geçtiniz.";
 
             if (hitPedestrian)
@@ -124,7 +130,7 @@ namespace TrafikParkuru.Stations
         {
             isCompleted = true;
             playerCar = null;
-            ScenarioManager.Instance.CompleteStage(GameStage.Crosswalk, score, note);
+            ScenarioManager.Instance.CompleteStage(stageToComplete, score, note);
         }
     }
 }

@@ -74,11 +74,12 @@ namespace TrafikParkuru.Core
                 new Vector3(LeftLaneX, carY, -130f),
             };
 
-            // Yan yol düz gidiş (+X yönü)
+            // Yan yol döngüsü (Segment 1, 2 ve 3)
             Vector3[] sideLoop = {
-                new Vector3(10f,  carY, SideRoadRightZ),
-                new Vector3(30f,  carY, SideRoadRightZ),
-                new Vector3(50f,  carY, SideRoadRightZ),
+                new Vector3(30f,   carY, -1.8f), // Teleport başlangıç
+                new Vector3(51.8f, carY, -1.8f), // Köşe 1 (Segment 1 -> 2)
+                new Vector3(51.8f, carY, 31.8f), // Köşe 2 (Segment 2 -> 3)
+                new Vector3(10f,   carY, 31.8f), // Teleport tetikleyici
             };
 
             // Spawn noktaları: (pozisyon, açı, waypoints, hız)
@@ -94,8 +95,8 @@ namespace TrafikParkuru.Core
                 (new Vector3(LeftLaneX,  carY,   10f), 180f, leftLoop,  Random.Range(5f, 7f)),
                 (new Vector3(LeftLaneX,  carY,  -80f), 180f, leftLoop,  Random.Range(5f, 7f)),
 
-                // Yan yol — 1 araç
-                (new Vector3(15f, carY, SideRoadRightZ), 90f, sideLoop, Random.Range(4f, 6f)),
+                // Yan yol — 1 araç (X=30f'da spawn olur ve loop'u takip eder)
+                (new Vector3(30f, carY, -1.8f), 90f, sideLoop, Random.Range(4f, 6f)),
             };
 
             foreach (var c in cars)

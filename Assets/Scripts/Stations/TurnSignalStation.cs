@@ -58,12 +58,12 @@ namespace TrafikParkuru.Stations
 
             if (rightSignalAccumulatedTime >= 1.0f)
             {
-                score = 25;
+                score = 20;
                 note = "Kavşağa yaklaşırken sağ sinyalinizi kurallara uygun şekilde (en az 1 sn) açık tuttunuz.";
             }
             else if (rightSignalAccumulatedTime > 0.05f) // Tolerans payı
             {
-                score = 12;
+                score = 10;
                 note = "Sağ sinyal verdiniz fakat kavşaktan önce yeterli süre (1 sn'den az) açık tutulmadı.";
             }
             else

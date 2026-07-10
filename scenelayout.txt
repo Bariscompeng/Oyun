@@ -1,15 +1,18 @@
 --- Scene GameObjects Dump ---
-Total GameObjects found: 481
+Total GameObjects found: 511
 - CrosswalkStation | Pos: (0.00, 0.05, -50.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: CrosswalkStation
         + zebraZ: -50
         + entryZ: -62
         + exitZ: -42
-- FinishCheckerPlane | Pos: (50.00, 0.02, 0.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.20, 1.00, 0.20) | Active: True
-- SpeedLimitSign_Right | Pos: (20.00, 0.00, -5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
-  - Pole | Pos: (20.00, 1.25, -5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (0.10, 1.25, 0.10) | Active: True
-  - Signboard | Pos: (20.00, 2.50, -5.50) | Rot: (90.00, 270.00, 0.00) | Scale: (0.90, 0.03, 0.90) | Active: True
-  - Text_Front | Pos: (19.97, 2.50, -5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+        + stageToComplete: Crosswalk
+        + useXAxis: False
+- Sidewalk_Side3_North | Pos: (30.00, 0.08, 35.50) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.15, 1.00) | Active: True
+- FinishCheckerPlane | Pos: (10.00, 0.02, 30.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.20, 1.00, 0.20) | Active: True
+- SpeedLimitSign_Right | Pos: (55.50, 0.00, 10.00) | Rot: (0.00, 180.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Pole | Pos: (55.50, 1.25, 10.00) | Rot: (0.00, 180.00, 0.00) | Scale: (0.10, 1.25, 0.10) | Active: True
+  - Signboard | Pos: (55.50, 2.50, 10.00) | Rot: (90.00, 180.00, 0.00) | Scale: (0.90, 0.03, 0.90) | Active: True
+  - Text_Front | Pos: (55.50, 2.50, 9.97) | Rot: (0.00, 180.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       * Component: RectTransform
       * Component: TextMeshPro
           + _SortingLayer: 0
@@ -80,7 +83,7 @@ Total GameObjects found: 481
           + m_isUsingLegacyAnimationComponent: False
           + m_isVolumetricText: False
           + m_Material: null
-  - Text_Back | Pos: (20.04, 2.50, -5.50) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Text_Back | Pos: (55.50, 2.50, 10.04) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       * Component: RectTransform
       * Component: TextMeshPro
           + _SortingLayer: 0
@@ -151,8 +154,9 @@ Total GameObjects found: 481
           + m_isUsingLegacyAnimationComponent: False
           + m_isVolumetricText: False
           + m_Material: null
-- SpeedZoneStation | Pos: (27.50, 0.00, 0.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+- SpeedZoneStation | Pos: (50.00, 0.00, 27.50) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: SpeedZoneStation
+- SideRoad_Merge | Pos: (25.00, 0.05, 30.00) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.10, 10.00) | Active: True
 - NPC_Spawner | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: NpcSpawner
         + npcCarPrefab: ToyCar (UnityEngine.GameObject)
@@ -185,8 +189,8 @@ areaError: 15
   - Sidewalks | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     - Sidewalk_Left | Pos: (-5.50, 0.08, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 0.15, 300.00) | Active: True
     - Sidewalk_Right_South | Pos: (5.50, 0.08, -77.50) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 0.15, 145.00) | Active: True
-    - Sidewalk_Right_North | Pos: (5.50, 0.08, 77.50) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 0.15, 145.00) | Active: True
-    - Sidewalk_Side_North | Pos: (30.00, 0.08, 5.50) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.15, 1.00) | Active: True
+    - Sidewalk_Right_North_Part1 | Pos: (5.50, 0.08, 15.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 0.15, 20.00) | Active: True
+    - Sidewalk_Side_North | Pos: (25.00, 0.08, 5.50) | Rot: (0.00, 0.00, 0.00) | Scale: (40.00, 0.15, 1.00) | Active: True
     - Sidewalk_Side_South | Pos: (30.00, 0.08, -5.50) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.15, 1.00) | Active: True
   - RoadMarkings | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     - Dash_-147 | Pos: (0.00, 0.05, -147.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.15, 0.01, 4.00) | Active: True
@@ -219,16 +223,6 @@ areaError: 15
     - Custom_LeftBorderMain | Pos: (-4.85, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.15, 0.01, 300.00) | Active: True
     - Custom_RightBorderMainBack | Pos: (4.85, 0.06, -77.50) | Rot: (0.00, 0.00, 0.00) | Scale: (0.15, 0.01, 145.00) | Active: True
     - Custom_RightBorderMainFront | Pos: (4.85, 0.06, 77.50) | Rot: (0.00, 0.00, 0.00) | Scale: (0.15, 0.01, 145.00) | Active: True
-    - Custom_SideRoadBorderLeft | Pos: (30.00, 0.06, 4.85) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadBorderRight | Pos: (30.00, 0.06, -4.85) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_7 | Pos: (7.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_13 | Pos: (13.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_19 | Pos: (19.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_25 | Pos: (25.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_31 | Pos: (31.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_37 | Pos: (37.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_43 | Pos: (43.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
-    - Custom_SideRoadCenterDash_49 | Pos: (49.00, 0.06, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (3.00, 0.01, 0.15) | Active: True
     - Custom_ZebraStripe_-4.2 | Pos: (-4.20, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.50, 0.01, 4.00) | Active: True
     - Custom_ZebraStripe_-3 | Pos: (-3.00, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.50, 0.01, 4.00) | Active: True
     - Custom_ZebraStripe_-1.8 | Pos: (-1.80, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.50, 0.01, 4.00) | Active: True
@@ -237,6 +231,31 @@ areaError: 15
     - Custom_ZebraStripe_1.8 | Pos: (1.80, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.50, 0.01, 4.00) | Active: True
     - Custom_ZebraStripe_3 | Pos: (3.00, 0.06, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.50, 0.01, 4.00) | Active: True
     - Custom_StopLineStation1 | Pos: (2.40, 0.06, -70.00) | Rot: (0.00, 0.00, 0.00) | Scale: (4.80, 0.01, 0.40) | Active: True
+    - SideRoadMarking_Center1_7 | Pos: (7.00, 0.11, 0.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center1_13 | Pos: (13.00, 0.11, 0.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center1_19 | Pos: (19.00, 0.11, 0.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center1_25 | Pos: (25.00, 0.11, 0.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center1_31 | Pos: (31.00, 0.11, 0.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center1_37 | Pos: (37.00, 0.11, 0.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center1_43 | Pos: (43.00, 0.11, 0.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Border1_Left | Pos: (25.00, 0.11, 4.85) | Rot: (90.00, 90.00, 0.00) | Scale: (0.12, 40.00, 1.00) | Active: True
+    - SideRoadMarking_Border1_Right | Pos: (30.00, 0.11, -4.85) | Rot: (90.00, 90.00, 0.00) | Scale: (0.12, 50.00, 1.00) | Active: True
+    - SideRoadMarking_Center2_3 | Pos: (50.00, 0.11, 3.00) | Rot: (90.00, 0.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center2_9 | Pos: (50.00, 0.11, 9.00) | Rot: (90.00, 0.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center2_15 | Pos: (50.00, 0.11, 15.00) | Rot: (90.00, 0.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center2_21 | Pos: (50.00, 0.11, 21.00) | Rot: (90.00, 0.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center2_27 | Pos: (50.00, 0.11, 27.00) | Rot: (90.00, 0.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Border2_East | Pos: (54.85, 0.11, 15.00) | Rot: (90.00, 0.00, 0.00) | Scale: (0.12, 40.00, 1.00) | Active: True
+    - SideRoadMarking_Border2_West | Pos: (45.15, 0.11, 15.00) | Rot: (90.00, 0.00, 0.00) | Scale: (0.12, 20.00, 1.00) | Active: True
+    - SideRoadMarking_Center3_7 | Pos: (7.00, 0.11, 30.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center3_13 | Pos: (13.00, 0.11, 30.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center3_19 | Pos: (19.00, 0.11, 30.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center3_25 | Pos: (25.00, 0.11, 30.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center3_31 | Pos: (31.00, 0.11, 30.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center3_37 | Pos: (37.00, 0.11, 30.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Center3_43 | Pos: (43.00, 0.11, 30.00) | Rot: (90.00, 90.00, 0.00) | Scale: (0.15, 3.00, 1.00) | Active: True
+    - SideRoadMarking_Border3_North | Pos: (30.00, 0.11, 34.85) | Rot: (90.00, 90.00, 0.00) | Scale: (0.12, 50.00, 1.00) | Active: True
+    - SideRoadMarking_Border3_South | Pos: (25.00, 0.11, 25.15) | Rot: (90.00, 90.00, 0.00) | Scale: (0.12, 40.00, 1.00) | Active: True
   - Streetlights | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     - Streetlight | Pos: (-6.00, 0.00, -130.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       - Pole | Pos: (-6.00, 2.50, -130.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.12, 2.50, 0.12) | Active: True
@@ -628,7 +647,7 @@ areaError: 15
     - Building_R_-80 | Pos: (20.02, 7.50, -80.00) | Rot: (0.00, 0.00, 0.00) | Scale: (8.04, 14.99, 15.32) | Active: True
     - Building_R_-60 | Pos: (20.13, 4.02, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (8.26, 8.04, 14.62) | Active: True
     - Building_R_-40 | Pos: (21.86, 10.39, -40.00) | Rot: (0.00, 0.00, 0.00) | Scale: (11.72, 20.79, 13.84) | Active: True
-    - Building_R_40 | Pos: (20.09, 8.32, 40.00) | Rot: (0.00, 0.00, 0.00) | Scale: (8.18, 16.63, 13.49) | Active: True
+    - Building_R_40 | Pos: (20.09, 8.32, 40.00) | Rot: (0.00, 0.00, 0.00) | Scale: (8.18, 16.63, 13.49) | Active: False
     - Building_R_60 | Pos: (21.58, 7.06, 60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (11.17, 14.12, 14.13) | Active: True
     - Building_R_80 | Pos: (21.81, 6.08, 80.00) | Rot: (0.00, 0.00, 0.00) | Scale: (11.63, 12.16, 14.35) | Active: True
     - Building_R_100 | Pos: (21.76, 4.14, 100.00) | Rot: (0.00, 0.00, 0.00) | Scale: (11.53, 8.27, 15.83) | Active: True
@@ -735,8 +754,9 @@ areaError: 15
         + chaseCamera: 
         + cockpitParent: Cockpit (UnityEngine.GameObject)
         + startInFps: True
-- FinishTrigger | Pos: (50.00, 0.00, 0.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+- FinishTrigger | Pos: (10.00, 0.00, 30.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: FinishTrigger
+- Sidewalk_Side3_South | Pos: (25.00, 0.08, 24.50) | Rot: (0.00, 0.00, 0.00) | Scale: (40.00, 0.15, 1.00) | Active: True
 - Directional Light | Pos: (0.00, 3.00, 0.00) | Rot: (32.00, 310.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: Light
     * Component: UniversalAdditionalLightData
@@ -753,10 +773,10 @@ areaError: 15
         + m_ShadowLayerMask: LightLayerDefault
         + m_RenderingLayers: 1
         + m_ShadowRenderingLayers: 1
-- SpeedLimitSign_Left | Pos: (20.00, 0.00, 5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
-  - Pole | Pos: (20.00, 1.25, 5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (0.10, 1.25, 0.10) | Active: True
-  - Signboard | Pos: (20.00, 2.50, 5.50) | Rot: (90.00, 270.00, 0.00) | Scale: (0.90, 0.03, 0.90) | Active: True
-  - Text_Front | Pos: (19.97, 2.50, 5.50) | Rot: (0.00, 270.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+- SpeedLimitSign_Left | Pos: (44.50, 0.00, 10.00) | Rot: (0.00, 180.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Pole | Pos: (44.50, 1.25, 10.00) | Rot: (0.00, 180.00, 0.00) | Scale: (0.10, 1.25, 0.10) | Active: True
+  - Signboard | Pos: (44.50, 2.50, 10.00) | Rot: (90.00, 180.00, 0.00) | Scale: (0.90, 0.03, 0.90) | Active: True
+  - Text_Front | Pos: (44.50, 2.50, 9.97) | Rot: (0.00, 180.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       * Component: RectTransform
       * Component: TextMeshPro
           + _SortingLayer: 0
@@ -827,7 +847,7 @@ areaError: 15
           + m_isUsingLegacyAnimationComponent: False
           + m_isVolumetricText: False
           + m_Material: null
-  - Text_Back | Pos: (20.04, 2.50, 5.50) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Text_Back | Pos: (44.50, 2.50, 10.04) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       * Component: RectTransform
       * Component: TextMeshPro
           + _SortingLayer: 0
@@ -898,6 +918,7 @@ areaError: 15
           + m_isUsingLegacyAnimationComponent: False
           + m_isVolumetricText: False
           + m_Material: null
+- Sidewalk_Right_North_Part2 | Pos: (5.50, 0.08, 92.50) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 0.15, 115.00) | Active: True
 - TestRunner | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: False
     * Component: IntegrationTest
 - RoadMarkingManager | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
@@ -917,8 +938,10 @@ areaError: 15
         + targetX: 7
         + crosswalkZ: -50
         + walkSpeed: 1.6
+        + useXAxis: False
         + pedestrianPrefab: Pedestrian (UnityEngine.GameObject)
 - Road | Pos: (0.00, 0.05, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (10.00, 0.10, 300.00) | Active: True
+- Sidewalk_Side2_East | Pos: (55.50, 0.08, 15.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 0.15, 40.00) | Active: True
 - HUD | Pos: (663.00, 382.50, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (0.70, 0.70, 0.70) | Active: True
     * Component: RectTransform
     * Component: Canvas
@@ -1274,7 +1297,7 @@ areaError: 15
           * Component: TMP_SubMeshUI
               + m_fontAsset: LiberationSans SDF - Fallback (TMPro.TMP_FontAsset)
               + m_spriteAsset: 
-              + m_material: 
+              + m_material: null
               + m_sharedMaterial: LiberationSans SDF Material + LiberationSans SDF Atlas 1 (UnityEngine.Material)
               + m_isDefaultMaterial: False
               + m_padding: 1.25
@@ -1572,7 +1595,7 @@ areaError: 15
           * Component: TMP_SubMeshUI
               + m_fontAsset: LiberationSans SDF - Fallback (TMPro.TMP_FontAsset)
               + m_spriteAsset: 
-              + m_material: 
+              + m_material: null
               + m_sharedMaterial: LiberationSans SDF Material + LiberationSans SDF Atlas 1 (UnityEngine.Material)
               + m_isDefaultMaterial: False
               + m_padding: 1.25
@@ -4548,8 +4571,8 @@ areaError: 15
           + BlendHint: 0
           + Priority: Unity.Cinemachine.PrioritySettings
           + OutputChannel: Default
-          + FollowTargetAttachment: 1
-          + LookAtTargetAttachment: 1
+          + FollowTargetAttachment: 0
+          + LookAtTargetAttachment: 0
           + StandbyUpdate: RoundRobin
       * Component: FpsLookAround
           + keyboardSpeed: 25
@@ -5097,6 +5120,16 @@ TRAFFIC OK
       - WheelRearRRim | Pos: (0.98, 0.65, -141.31) | Rot: (325.00, 180.00, 180.00) | Scale: (1.00, 1.00, 1.00) | Active: True
       - Node-99 | Pos: (0.98, 0.65, -141.31) | Rot: (325.00, 180.00, 180.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     - Axles | Pos: (0.00, 0.65, -139.91) | Rot: (270.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+- PedestrianSpawner2 | Pos: (25.00, 0.00, 30.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    * Component: PedestrianSpawner
+        + crosswalkStation: CrosswalkStation2 (TrafikParkuru.Stations.CrosswalkStation)
+        + triggerZ: 40
+        + spawnX: 25
+        + targetX: 35
+        + crosswalkZ: 25
+        + walkSpeed: 1.6
+        + useXAxis: True
+        + pedestrianPrefab: Pedestrian (UnityEngine.GameObject)
 - PostProcessVolume | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: Volume
         + m_IsGlobal: True
@@ -5127,12 +5160,27 @@ TRAFFIC OK
 - Marker5 | Pos: (-7.00, 0.75, 120.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.50, 1.50, 1.50) | Active: False
 - TurnSignalStation | Pos: (0.00, 0.00, -11.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: TurnSignalStation
+- ZebraCrossing2 | Pos: (25.00, 0.11, 30.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+  - Stripe1 | Pos: (25.00, 0.11, 33.00) | Rot: (0.00, 90.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe2 | Pos: (25.00, 0.11, 31.50) | Rot: (0.00, 90.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe3 | Pos: (25.00, 0.11, 30.00) | Rot: (0.00, 90.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe4 | Pos: (25.00, 0.11, 28.50) | Rot: (0.00, 90.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
+  - Stripe5 | Pos: (25.00, 0.11, 27.00) | Rot: (0.00, 90.00, 0.00) | Scale: (0.60, 0.02, 4.00) | Active: True
 - Marker2 | Pos: (7.00, 0.75, -60.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.50, 1.50, 1.50) | Active: False
 - Marker1 | Pos: (-7.00, 0.75, -100.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.50, 1.50, 1.50) | Active: False
+- CrosswalkStation2 | Pos: (25.00, 0.05, 30.00) | Rot: (0.00, 90.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
+    * Component: CrosswalkStation
+        + zebraZ: 25
+        + entryZ: 37
+        + exitZ: 17
+        + stageToComplete: Crosswalk2
+        + useXAxis: True
 - Ground | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (40.00, 1.00, 40.00) | Active: True
 - Marker3 | Pos: (-7.00, 0.75, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.50, 1.50, 1.50) | Active: False
+- Sidewalk_Side2_West | Pos: (44.50, 0.08, 15.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 0.15, 20.00) | Active: True
 - glTF-StableFramerate | Pos: (0.00, 0.00, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
-- SideRoad | Pos: (30.00, 0.05, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.10, 10.00) | Active: True
+- SideRoad | Pos: (25.00, 0.05, 0.00) | Rot: (0.00, 0.00, 0.00) | Scale: (50.00, 0.10, 10.00) | Active: True
+- SideRoad_Turn | Pos: (50.00, 0.05, 15.00) | Rot: (0.00, 0.00, 0.00) | Scale: (10.00, 0.10, 40.00) | Active: True
 - TrafficLight | Pos: (6.00, 0.00, -70.00) | Rot: (0.00, 0.00, 0.00) | Scale: (1.00, 1.00, 1.00) | Active: True
     * Component: TrafficLightController
         + redRenderer: RedLight (UnityEngine.MeshRenderer)
