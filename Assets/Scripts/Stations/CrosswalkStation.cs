@@ -96,6 +96,13 @@ namespace TrafikParkuru.Stations
                     }
                 }
             }
+
+            // Oyuncu yaya geçidini geçtikten sonra istasyonu tamamla (OnTriggerExit beklemek yerine anında)
+            bool hasPassedZebra = useXAxis ? (carVal < zebraVal - 2.5f) : (carVal > zebraVal + 2.5f);
+            if (hasPassedZebra)
+            {
+                EvaluatePass();
+            }
         }
 
         private void EvaluatePass()

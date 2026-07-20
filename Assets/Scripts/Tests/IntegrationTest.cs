@@ -121,7 +121,7 @@ namespace TrafikParkuru.Tests
             }
             yield return new WaitForSeconds(0.4f);
 
-            // --- 4. İSTASYON: HIZ SINIRI (25 km/s) ---
+            // --- 4. İSTASYON: HIZ SINIRI (50 km/s) ---
             Debug.Log("4. İstasyon: Yan yol boyunca ilerlenip hız sınırı bölgesine yaklaşıyor...");
             // Segment 1 boyunca East yönünde gidiyoruz (X = 10f to X = 48.2f)
             yield return StartCoroutine(MoveCarThrough(new Vector3(48.2f, 0.5f, -1.8f), 10f));
@@ -134,9 +134,9 @@ namespace TrafikParkuru.Tests
             // Segment 2 (SpeedZone Z = 10f ila 27.5f arasındadır. Girmeden önce yavaşlıyoruz)
             yield return StartCoroutine(MoveCarThrough(new Vector3(48.2f, 0.5f, 5f), 10f));
             
-            // Hız sınırı bölgesi içinde (Z = 5f'ten Z = 27.5f'e) yavaşça sürülüyor...
-            Debug.Log("Hız sınırı bölgesi içinde yavaşça sürülüyor...");
-            yield return StartCoroutine(MoveCarThrough(new Vector3(48.2f, 0.5f, 27.5f), 2.22f));
+            // Hız sınırı bölgesi içinde (Z = 5f'ten Z = 27.5f'e) sürülüyor...
+            Debug.Log("Hız sınırı bölgesi içinde sürülüyor...");
+            yield return StartCoroutine(MoveCarThrough(new Vector3(48.2f, 0.5f, 27.5f), 11f));
             yield return new WaitForSeconds(0.5f);
 
             // --- 5. İSTASYON: 2. YAYA GEÇİDİ (Segment 3, Z = 30, X = 25) ---

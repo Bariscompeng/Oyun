@@ -9,6 +9,10 @@ namespace TrafikParkuru.Stations
         [SerializeField] private Vector3 targetPosition;
         [SerializeField] private float speed = 1.5f;
 
+        [Header("Görsel Eksen Düzeltmesi")]
+        [Tooltip("Eğer yaya yerde yatıyorsa bu ekseni (örneğin X: -90, 0 veya 90) ayarlayabilirsiniz.")]
+        [SerializeField] private Vector3 visualRotationOffset = Vector3.zero; 
+
         private Vector3 startPosition;
         private bool isWalking = false;
         private bool hitByCar = false;
@@ -35,6 +39,13 @@ namespace TrafikParkuru.Stations
         {
             startPosition = transform.position;
             animator = GetComponentInChildren<Animator>();
+
+            // Görsel modelin eksenini düzelt (İlk child genelde modelin kendisidir)
+            if (transform.childCount > 0)
+            {
+                Transform visualModel = transform.GetChild(0);
+                visualModel.localRotation = Quaternion.Euler(visualRotationOffset);
+            }
         }
 
         public void Initialize(Vector3 start, Vector3 target, float walkSpeed, CrosswalkStation crosswalkStation)

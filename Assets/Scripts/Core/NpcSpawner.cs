@@ -85,8 +85,7 @@ namespace TrafikParkuru.Core
             // Spawn noktaları: (pozisyon, açı, waypoints, hız)
             var cars = new (Vector3 pos, float yaw, Vector3[] wps, float spd)[]
             {
-                // Sağ şerit — 3 araç aralıklı
-                (new Vector3(RightLaneX, carY, -110f), 0f,   rightLoop, Random.Range(6f, 8f)),
+                // Sağ şerit — 2 araç aralıklı (Oyuncunun önündeki görevleri tetiklememesi için -110f'deki araç kaldırıldı)
                 (new Vector3(RightLaneX, carY,  -20f), 0f,   rightLoop, Random.Range(6f, 8f)),
                 (new Vector3(RightLaneX, carY,   80f), 0f,   rightLoop, Random.Range(6f, 8f)),
 
@@ -297,6 +296,12 @@ namespace TrafikParkuru.Core
 
         private void ApplyPedestrianColors(GameObject ped)
         {
+            // Eğer prefab gerçekçi bir modelse (Cesium veya Pedestrian içeriyorsa), orijinal materyallerini koru
+            if (ped != null && (ped.name.Contains("Pedestrian") || ped.name.Contains("Cesium")))
+            {
+                return;
+            }
+
             Color c = RandomPedestrianColor();
             foreach (Renderer r in ped.GetComponentsInChildren<Renderer>(true))
             {

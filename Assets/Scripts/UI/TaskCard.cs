@@ -25,6 +25,7 @@ namespace TrafikParkuru.UI
             {
                 ScenarioManager.Instance.OnStageStarted += OnStageStarted;
                 ScenarioManager.Instance.OnStageCompleted += OnStageCompleted;
+                ScenarioManager.Instance.OnGameFinished += OnGameFinished;
                 
                 // Başlangıç durumunu ayarla
                 UpdateCardVisuals(ScenarioManager.Instance.CurrentStage);
@@ -37,7 +38,13 @@ namespace TrafikParkuru.UI
             {
                 ScenarioManager.Instance.OnStageStarted -= OnStageStarted;
                 ScenarioManager.Instance.OnStageCompleted -= OnStageCompleted;
+                ScenarioManager.Instance.OnGameFinished -= OnGameFinished;
             }
+        }
+
+        private void OnGameFinished()
+        {
+            UpdateCardVisuals(GameStage.Finish);
         }
 
         private void OnStageStarted(GameStage stage)
@@ -56,63 +63,80 @@ namespace TrafikParkuru.UI
         private void UpdateCardVisuals(GameStage activeStage)
         {
             if (redLightText == null || crosswalkText == null || turnText == null || speedZoneText == null) return;
+            if (ScenarioManager.Instance == null) return;
 
             // 1. Kırmızı Işık
-            if (activeStage == GameStage.RedLight)
+            bool isRedLightCompleted = ScenarioManager.Instance.GetStageNote(GameStage.RedLight) != "Henüz başlanmadı.";
+            if (isRedLightCompleted)
+            {
+                SetCompletedStyle(redLightText, "Kırmızı Işıkta Dur!", ScenarioManager.Instance.GetStageScore(GameStage.RedLight));
+            }
+            else if (activeStage == GameStage.RedLight)
             {
                 SetActiveStyle(redLightText, "Kırmızı Işıkta Dur!");
             }
             else
             {
-                SetCompletedStyle(redLightText, "Kırmızı Işıkta Dur!", ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.RedLight) : 20);
+                SetPendingStyle(redLightText, "Kırmızı Işıkta Dur!");
             }
 
             // 2. Yaya Geçitleri
-            if (activeStage == GameStage.Crosswalk)
+            bool isCrosswalkCompleted = ScenarioManager.Instance.GetStageNote(GameStage.Crosswalk) != "Henüz başlanmadı.";
+            bool isCrosswalk2Completed = ScenarioManager.Instance.GetStageNote(GameStage.Crosswalk2) != "Henüz başlanmadı.";
+
+            if (isCrosswalkCompleted && isCrosswalk2Completed)
             {
-                SetActiveStyle(crosswalkText, "1. Yaya Geçidinde Yol Ver!");
+                int score1 = ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk);
+                int score2 = ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk2);
+                SetCompletedStyle(crosswalkText, "Yaya Geçitlerinde Yol Ver!", score1 + score2);
             }
             else if (activeStage == GameStage.Crosswalk2)
             {
                 SetActiveStyle(crosswalkText, "2. Yaya Geçidinde Yol Ver!");
             }
-            else if (activeStage < GameStage.Crosswalk)
+            else if (activeStage == GameStage.Crosswalk)
+            {
+                SetActiveStyle(crosswalkText, "1. Yaya Geçidinde Yol Ver!");
+            }
+            else if (isCrosswalkCompleted)
+            {
+                // 1. yaya geçidi tamamlanmış ama henüz 2. yaya geçidine gelinmemiş (arada Turn ve SpeedZone var)
+                int score1 = ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk);
+                SetCompletedStyle(crosswalkText, "1. Yaya Geçidinde Yol Ver!", score1);
+            }
+            else
             {
                 SetPendingStyle(crosswalkText, "Yaya Geçitlerinde Yol Ver!");
             }
-            else
-            {
-                int score1 = ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk) : 20;
-                int score2 = ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.Crosswalk2) : 20;
-                SetCompletedStyle(crosswalkText, "Yaya Geçitlerinde Yol Ver!", score1 + score2);
-            }
 
             // 3. Sağa Dönüş
-            if (activeStage == GameStage.Turn)
+            bool isTurnCompleted = ScenarioManager.Instance.GetStageNote(GameStage.Turn) != "Henüz başlanmadı.";
+            if (isTurnCompleted)
+            {
+                SetCompletedStyle(turnText, "Kavşakta Sağa Sinyal Ver!", ScenarioManager.Instance.GetStageScore(GameStage.Turn));
+            }
+            else if (activeStage == GameStage.Turn)
             {
                 SetActiveStyle(turnText, "Kavşakta Sağa Sinyal Ver!");
             }
-            else if (activeStage < GameStage.Turn)
+            else
             {
                 SetPendingStyle(turnText, "Kavşakta Sağa Sinyal Ver!");
             }
-            else
-            {
-                SetCompletedStyle(turnText, "Kavşakta Sağa Sinyal Ver!", ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.Turn) : 20);
-            }
 
             // 4. Hız Sınırı
-            if (activeStage == GameStage.SpeedZone)
+            bool isSpeedZoneCompleted = ScenarioManager.Instance.GetStageNote(GameStage.SpeedZone) != "Henüz başlanmadı.";
+            if (isSpeedZoneCompleted)
             {
-                SetActiveStyle(speedZoneText, "Hız Sınırına Uy! (Maks 25 km/s)");
+                SetCompletedStyle(speedZoneText, "Hız Sınırına Uy! (Maks 50 km/s)", ScenarioManager.Instance.GetStageScore(GameStage.SpeedZone));
             }
-            else if (activeStage < GameStage.SpeedZone)
+            else if (activeStage == GameStage.SpeedZone)
             {
-                SetPendingStyle(speedZoneText, "Hız Sınırına Uy! (Maks 25 km/s)");
+                SetActiveStyle(speedZoneText, "Hız Sınırına Uy! (Maks 50 km/s)");
             }
             else
             {
-                SetCompletedStyle(speedZoneText, "Hız Sınırına Uy! (Maks 25 km/s)", ScenarioManager.Instance ? ScenarioManager.Instance.GetStageScore(GameStage.SpeedZone) : 20);
+                SetPendingStyle(speedZoneText, "Hız Sınırına Uy! (Maks 50 km/s)");
             }
         }
 
@@ -120,21 +144,21 @@ namespace TrafikParkuru.UI
         {
             txt.color = activeColor;
             txt.fontStyle = FontStyles.Bold;
-            txt.text = $"<color=#EAB308>&gt;</color> <b>{text}</b>";
+            txt.text = $"<color=#FFD700>»</color> <b>{text}</b>";
         }
 
         private void SetCompletedStyle(TMP_Text txt, string text, int score)
         {
             txt.color = completedColor;
             txt.fontStyle = FontStyles.Normal;
-            txt.text = $"<color=#22C55E>[v]</color> <s>{text} (+{score} Puan)</s>";
+            txt.text = $"<color=#00FF88>[x]</color> <color=#94A3B8><s>{text}</s> <color=#00FF88>+{score} P</color></color>";
         }
 
         private void SetPendingStyle(TMP_Text txt, string text)
         {
             txt.color = pendingColor;
             txt.fontStyle = FontStyles.Normal;
-            txt.text = $"<color=#9CA3AF>[ ]</color> {text}";
+            txt.text = $"<color=#475569>[ ]</color> <color=#94A3B8>{text}</color>";
         }
     }
 }

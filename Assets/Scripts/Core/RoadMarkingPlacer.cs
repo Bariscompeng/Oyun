@@ -8,6 +8,7 @@ namespace TrafikParkuru.Core
     /// - İki kenarda sürekli beyaz çizgiler (solid edge lines)
     /// Awake'de çalışır, sahnedeki "Road" objesinin boyutlarına göre hesaplar.
     /// </summary>
+    [ExecuteAlways]
     public class RoadMarkingPlacer : MonoBehaviour
     {
         [Header("Yol Referansı")]
@@ -30,38 +31,36 @@ namespace TrafikParkuru.Core
 
         private void Awake()
         {
+            // Eğer sahneye zaten kaydedilmişse tekrar oluşturma (edit modunda değilken)
+            if (Application.isPlaying && transform.Find("RoadMarkings") != null)
+            {
+                return;
+            }
+
+            // Edit modunda veya sahne boşsa oluştur
             if (road == null)
             {
                 GameObject roadGo = GameObject.Find("Road");
                 if (roadGo != null) road = roadGo.transform;
             }
 
-            if (road == null)
+            if (road != null)
             {
-                Debug.LogError("RoadMarkingPlacer: Road nesnesi bulunamadı!");
-                return;
+                Renderer roadRenderer = road.GetComponent<Renderer>();
+                if (roadRenderer != null)
+                {
+                    Bounds b = roadRenderer.bounds;
+                    roadHalfWidth = b.size.x / 2f;
+                    roadStartZ = b.min.z;
+                    roadEndZ = b.max.z;
+                }
             }
 
-            // Yol boyutlarını hesapla
-            // Road scale (10, 0.1, 300) → gerçek boyut = Plane ise 10*10=100, Cube ise 1*10=10
-            Renderer roadRenderer = road.GetComponent<Renderer>();
-            if (roadRenderer != null)
+            // Eğer oyunu başlatıyorsak ve sahne boşsa runtime oluştur
+            if (Application.isPlaying)
             {
-                Bounds b = roadRenderer.bounds;
-                roadHalfWidth = b.size.x / 2f;
-                roadStartZ = b.min.z;
-                roadEndZ = b.max.z;
+                PlaceMarkings();
             }
-            else
-            {
-                // fallback
-                roadHalfWidth = 5f;
-                roadStartZ = -150f;
-                roadEndZ = 150f;
-            }
-
-            CreateMaterials();
-            PlaceMarkings();
         }
 
         private void CreateMaterials()
@@ -84,8 +83,60 @@ namespace TrafikParkuru.Core
             }
         }
 
-        private void PlaceMarkings()
+        [ContextMenu("Clear Road Markings")]
+        public void ClearMarkings()
         {
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = transform.GetChild(i);
+                if (child.name == "RoadMarkings")
+                {
+                    if (Application.isPlaying)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                    else
+                    {
+                        DestroyImmediate(child.gameObject);
+                    }
+                }
+            }
+        }
+
+        [ContextMenu("Generate Road Markings")]
+        public void PlaceMarkings()
+        {
+            ClearMarkings();
+
+            if (road == null)
+            {
+                GameObject roadGo = GameObject.Find("Road");
+                if (roadGo != null) road = roadGo.transform;
+            }
+
+            if (road == null)
+            {
+                Debug.LogError("RoadMarkingPlacer: Road nesnesi bulunamadı!");
+                return;
+            }
+
+            Renderer roadRenderer = road.GetComponent<Renderer>();
+            if (roadRenderer != null)
+            {
+                Bounds b = roadRenderer.bounds;
+                roadHalfWidth = b.size.x / 2f;
+                roadStartZ = b.min.z;
+                roadEndZ = b.max.z;
+            }
+            else
+            {
+                roadHalfWidth = 5f;
+                roadStartZ = -150f;
+                roadEndZ = 150f;
+            }
+
+            CreateMaterials();
+
             // Ana parent
             GameObject parent = new GameObject("RoadMarkings");
             parent.transform.SetParent(transform, false);
@@ -100,7 +151,7 @@ namespace TrafikParkuru.Core
                 dash.transform.position = new Vector3(0f, markingY, z + dashLength / 2f);
                 dash.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 dash.transform.localScale = new Vector3(lineWidth, dashLength, 1f);
-                dash.GetComponent<Renderer>().sharedMaterial = whiteMat;
+                dash.GetComponent<Renderer>().sharedMaterial = whiteMat; // Beyaz materyal atandı
 
                 z += dashLength + gapLength;
                 dashIndex++;
@@ -111,10 +162,16 @@ namespace TrafikParkuru.Core
             CreateSolidLine("LeftEdgeLine", parent.transform, -edgeOffset, whiteMat);
 
             // 3. Sağ kenar çizgisi (sürekli beyaz) — kavşaklarda boşluk bırakılarak 3 parça halinde
-            // Kavşak 1: Z = -5..5  |  Kavşak 2: Z = 25..35
             CreateSolidLineSegment("RightEdgeLine_Part1", parent.transform, edgeOffset, roadStartZ, -5f, whiteMat);
             CreateSolidLineSegment("RightEdgeLine_Part2", parent.transform, edgeOffset, 5f, 25f, whiteMat);
             CreateSolidLineSegment("RightEdgeLine_Part3", parent.transform, edgeOffset, 35f, roadEndZ, whiteMat);
+
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
+            }
+#endif
         }
 
         private void CreateSolidLine(string name, Transform parent, float xPos, Material mat)
@@ -150,7 +207,11 @@ namespace TrafikParkuru.Core
 
             // Collider gereksiz, kaldır
             Collider col = quad.GetComponent<Collider>();
-            if (col != null) Destroy(col);
+            if (col != null)
+            {
+                if (Application.isPlaying) Destroy(col);
+                else DestroyImmediate(col);
+            }
 
             return quad;
         }

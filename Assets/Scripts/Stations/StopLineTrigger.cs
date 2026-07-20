@@ -51,6 +51,10 @@ namespace TrafikParkuru.Stations
                     score = 10;
                     note = "Kırmızı ve sarı birlikte yanarken (yeşili tam beklemeden) geçtiniz.";
                     break;
+                case TrafficLightState.Yellow:
+                    score = 0;
+                    note = "Sarı ışıkta geçerek ihlal gerçekleştirdiniz.";
+                    break;
                 case TrafficLightState.Red:
                     score = 0;
                     note = "Kırmızı ışıkta durmayarak ihlal gerçekleştirdiniz.";

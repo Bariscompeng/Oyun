@@ -25,7 +25,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private float brakeTorque = 2500f;
     [SerializeField] private float idleBrakeTorque = 40f;
     [SerializeField] private float maxSteerAngle = 32f;
-    [SerializeField] private float steerSpeed = 6f;
+    [SerializeField] private float steerSpeed = 1.5f;
     [SerializeField] private float maxSpeedKmh = 80f;
     [SerializeField] private float maxReverseSpeedKmh = 25f;
 
@@ -101,7 +101,19 @@ public class CarController : MonoBehaviour
         float brake = brakeAction != null ? brakeAction.ReadValue<float>() : 0f;
         float steerTarget = steerAction != null ? steerAction.ReadValue<float>() : 0f;
 
-        currentSteer = Mathf.MoveTowards(currentSteer, steerTarget, steerSpeed * Time.fixedDeltaTime);
+        // Eger girdi bir direksiyon seti veya gamepad ise (analog), yumusatma (smoothing) uygulama
+        bool isAnalogSteer = steerAction != null && steerAction.activeControl != null && 
+                             (steerAction.activeControl.device is Gamepad || steerAction.activeControl.device is Joystick);
+
+        if (isAnalogSteer)
+        {
+            currentSteer = steerTarget;
+        }
+        else
+        {
+            currentSteer = Mathf.MoveTowards(currentSteer, steerTarget, steerSpeed * Time.fixedDeltaTime);
+        }
+
         float steerAngle = currentSteer * maxSteerAngle;
         wheelFL.steerAngle = steerAngle;
         wheelFR.steerAngle = steerAngle;

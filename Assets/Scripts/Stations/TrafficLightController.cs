@@ -7,7 +7,8 @@ namespace TrafikParkuru.Stations
     {
         Red,
         RedYellow,
-        Green
+        Green,
+        Yellow
     }
 
     public class TrafficLightController : MonoBehaviour
@@ -26,6 +27,8 @@ namespace TrafikParkuru.Stations
         [Header("Zamanlama Eşikleri")]
         [SerializeField] private float requiredStopTime = 2.4f;
         [SerializeField] private float redYellowDuration = 1.3f;
+        [SerializeField] private float greenDuration = 8.0f;
+        [SerializeField] private float yellowDuration = 2.0f;
         [SerializeField] private float speedThreshold = 0.3f; // 0.3 m/s (~1 km/h) altı durma sayılır
 
         private TrafficLightState currentState = TrafficLightState.Red;
@@ -33,6 +36,7 @@ namespace TrafikParkuru.Stations
         private CarController playerCar;
         private float stopTimer = 0f;
         private float stateTimer = 0f;
+        private System.Collections.Generic.List<Rigidbody> carsInZone = new System.Collections.Generic.List<Rigidbody>();
 
         public TrafficLightState CurrentState => currentState;
 
@@ -45,21 +49,45 @@ namespace TrafikParkuru.Stations
         {
             if (currentState == TrafficLightState.Red)
             {
-                if (isPlayerInZone && playerCar != null)
+                bool anyCarWaiting = false;
+
+                // Temizlik: Yok edilmiş rigidbodyler varsa listeden çıkar
+                carsInZone.RemoveAll(item => item == null);
+
+                foreach (var rb in carsInZone)
                 {
-                    // Oyuncunun hizi durma esiginin altinda mi?
-                    if (playerCar.SpeedMs < speedThreshold)
+                    float speed = 0f;
+                    var driver = rb.GetComponent<TrafikParkuru.Core.NpcDriver>();
+                    if (driver != null)
                     {
-                        stopTimer += Time.deltaTime;
-                        if (stopTimer >= requiredStopTime)
-                        {
-                            SetLightState(TrafficLightState.RedYellow);
-                        }
+                        speed = driver.CurrentSpeed;
                     }
                     else
                     {
-                        // Eger hareket ederse sayac sifirlanir
-                        stopTimer = 0f;
+                        var playerCtrl = rb.GetComponent<CarController>();
+                        if (playerCtrl != null)
+                        {
+                            speed = playerCtrl.SpeedMs;
+                        }
+                        else
+                        {
+                            speed = rb.linearVelocity.magnitude;
+                        }
+                    }
+
+                    if (speed < speedThreshold)
+                    {
+                        anyCarWaiting = true;
+                        break;
+                    }
+                }
+
+                if (anyCarWaiting)
+                {
+                    stopTimer += Time.deltaTime;
+                    if (stopTimer >= requiredStopTime)
+                    {
+                        SetLightState(TrafficLightState.RedYellow);
                     }
                 }
                 else
@@ -73,6 +101,22 @@ namespace TrafikParkuru.Stations
                 if (stateTimer >= redYellowDuration)
                 {
                     SetLightState(TrafficLightState.Green);
+                }
+            }
+            else if (currentState == TrafficLightState.Green)
+            {
+                stateTimer += Time.deltaTime;
+                if (stateTimer >= greenDuration)
+                {
+                    SetLightState(TrafficLightState.Yellow);
+                }
+            }
+            else if (currentState == TrafficLightState.Yellow)
+            {
+                stateTimer += Time.deltaTime;
+                if (stateTimer >= yellowDuration)
+                {
+                    SetLightState(TrafficLightState.Red);
                 }
             }
         }
@@ -92,7 +136,7 @@ namespace TrafikParkuru.Stations
         {
             // Materyal renklerini ve emisyonlarini ayarla
             SetRendererEmission(redRenderer, redColor, currentState == TrafficLightState.Red || currentState == TrafficLightState.RedYellow);
-            SetRendererEmission(yellowRenderer, yellowColor, currentState == TrafficLightState.RedYellow);
+            SetRendererEmission(yellowRenderer, yellowColor, currentState == TrafficLightState.RedYellow || currentState == TrafficLightState.Yellow);
             SetRendererEmission(greenRenderer, greenColor, currentState == TrafficLightState.Green);
         }
 
@@ -119,6 +163,16 @@ namespace TrafikParkuru.Stations
 
         private void OnTriggerEnter(Collider other)
         {
+            if (other.CompareTag("Player") || other.name.Contains("NPC_Car") || other.name.Contains("NPC"))
+            {
+                Rigidbody rb = other.attachedRigidbody;
+                if (rb != null && !carsInZone.Contains(rb))
+                {
+                    carsInZone.Add(rb);
+                    Debug.Log($"TrafficLightController: Araç bekleme alanına girdi -> {rb.name}");
+                }
+            }
+
             if (other.CompareTag("Player"))
             {
                 isPlayerInZone = true;
@@ -131,6 +185,16 @@ namespace TrafikParkuru.Stations
 
         private void OnTriggerExit(Collider other)
         {
+            if (other.CompareTag("Player") || other.name.Contains("NPC_Car") || other.name.Contains("NPC"))
+            {
+                Rigidbody rb = other.attachedRigidbody;
+                if (rb != null && carsInZone.Contains(rb))
+                {
+                    carsInZone.Remove(rb);
+                    Debug.Log($"TrafficLightController: Araç bekleme alanından çıktı -> {rb.name}");
+                }
+            }
+
             if (other.CompareTag("Player"))
             {
                 isPlayerInZone = false;

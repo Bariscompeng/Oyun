@@ -8,9 +8,9 @@ namespace TrafikParkuru.Core
     {
         RedLight,
         Crosswalk,
-        Crosswalk2,
         Turn,
         SpeedZone,
+        Crosswalk2,
         Finish
     }
 
@@ -99,9 +99,9 @@ namespace TrafikParkuru.Core
 
         public void CompleteStage(GameStage stage, int score, string note)
         {
-            if (stage != currentStage)
+            // Zaten tamamlanmışsa tekrar tamamlama (böylece ilk geçiş geçerli kalır)
+            if (stageNotes.ContainsKey(stage) && stageNotes[stage] != "Henüz başlanmadı.")
             {
-                Debug.LogWarning($"ScenarioManager: Mevcut olmayan bir istasyon ({stage}) tamamlanmaya çalışıldı. Beklenen: {currentStage}");
                 return;
             }
 
@@ -110,18 +110,35 @@ namespace TrafikParkuru.Core
             
             Debug.Log($"ScenarioManager: İstasyon Tamamlandı: {stage} - Puan: {score} - Not: {note}");
             
+            // Bir sonraki tamamlanmamış istasyonu bul
+            UpdateCurrentStage();
+
             OnStageCompleted?.Invoke(stage, score, note);
             OnScoreChanged?.Invoke(GetTotalScore());
+        }
 
-            // Bir sonraki istasyona gec
-            if (currentStage < GameStage.Finish)
+        private void UpdateCurrentStage()
+        {
+            if (isGameFinished) return;
+
+            foreach (GameStage stage in Enum.GetValues(typeof(GameStage)))
             {
-                currentStage++;
-                OnStageStarted?.Invoke(currentStage);
-            }
-            else if (currentStage == GameStage.Finish)
-            {
-                FinishGame();
+                if (stage == GameStage.Finish)
+                {
+                    currentStage = GameStage.Finish;
+                    FinishGame();
+                    return;
+                }
+
+                if (!stageNotes.ContainsKey(stage) || stageNotes[stage] == "Henüz başlanmadı.")
+                {
+                    if (currentStage != stage)
+                    {
+                        currentStage = stage;
+                        OnStageStarted?.Invoke(currentStage);
+                    }
+                    return;
+                }
             }
         }
 

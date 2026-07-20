@@ -86,6 +86,15 @@ namespace TrafikParkuru.UI
             StartRebinding("Steer", 2, steerRightText);
         }
 
+        // Direksiyon setleri için tüm ekseni atama (Composite değil, doğrudan Axis binding)
+        public void StartRebindSteerAxis(TMP_Text textComponent)
+        {
+            // Genellikle 0. index doğrudan axis bind'ıdır (Gamepad/Joystick), 
+            // Varsa 0. indexi, yoksa composite olmayan ilk bind'ı bulabiliriz.
+            // Ama şimdilik 0 olarak verelim, eğer oyuna özel bir "Direksiyon Eksen" butonu eklerseniz bunu kullanabilirsiniz.
+            StartRebinding("Steer", 0, textComponent);
+        }
+
         public void StartRebindSignalLeft()
         {
             StartRebinding("SignalLeft", 0, signalLeftText);

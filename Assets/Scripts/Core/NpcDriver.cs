@@ -29,6 +29,7 @@ namespace TrafikParkuru.Core
 
         private int       currentWaypointIndex = 0;
         private float     currentSpeed         = 0f;
+        public float CurrentSpeed => currentSpeed;
         private Transform playerTransform;
         private float     lockedY;      // Pivot'un sabit tutulacağı Y değeri
         private BoxCollider boxCol;
@@ -124,11 +125,22 @@ namespace TrafikParkuru.Core
 
                 if (loopTeleport && nextIdx == 0)
                 {
+                    // Oyuncu veya herhangi bir araç teleport noktasına yakın mı?
+                    Vector3 targetPos = waypoints[0];
+                    if (playerTransform != null)
+                    {
+                        float distToPlayer = Vector3.Distance(new Vector3(targetPos.x, transform.position.y, targetPos.z), playerTransform.position);
+                        if (distToPlayer < 18f)
+                        {
+                            // Oyuncu veya başka bir araç çok yakın, bu karede teleport olma, bekle!
+                            return;
+                        }
+                    }
+
                     // Son waypoint'e ulaşıldı — başlangıca TELEPORT
-                    // (Geri dönmek yerine şırınlanarak aynı yönde devam eder)
                     Vector3 tp = transform.position;
-                    tp.x = waypoints[0].x;
-                    tp.z = waypoints[0].z;
+                    tp.x = targetPos.x;
+                    tp.z = targetPos.z;
                     transform.position = tp;
                     currentWaypointIndex = 0;
                 }
@@ -152,7 +164,8 @@ namespace TrafikParkuru.Core
             {
                 var light = Object.FindAnyObjectByType<TrafikParkuru.Stations.TrafficLightController>();
                 if (light != null && (light.CurrentState == TrafikParkuru.Stations.TrafficLightState.Red || 
-                                     light.CurrentState == TrafikParkuru.Stations.TrafficLightState.RedYellow))
+                                     light.CurrentState == TrafikParkuru.Stations.TrafficLightState.RedYellow ||
+                                     light.CurrentState == TrafikParkuru.Stations.TrafficLightState.Yellow))
                 {
                     shouldStop = true;
                 }
@@ -181,9 +194,9 @@ namespace TrafikParkuru.Core
                 }
             }
 
-            // Raycast ile önündeki aracı/rigidbody tespiti
+            // SphereCast ile önündeki aracı/rigidbody tespiti (Tetikleyiciler göz ardı edilir)
             Vector3 rayOrigin = transform.position + Vector3.up * 0.5f;
-            if (!shouldStop && Physics.Raycast(rayOrigin, transform.forward, out RaycastHit hit, detectionDistance))
+            if (!shouldStop && Physics.SphereCast(rayOrigin, 0.8f, transform.forward, out RaycastHit hit, detectionDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
                 // Rigidbody'li araç veya player tespiti
                 if (hit.collider.attachedRigidbody != null || hit.collider.CompareTag("Player") || hit.collider.name.Contains("NPC_Car"))
@@ -194,7 +207,7 @@ namespace TrafikParkuru.Core
                 }
             }
 
-            // Oyuncu tespiti (Açı ve mesafe bazlı - raycast dışı durumlar için)
+            // Oyuncu tespiti (Geniş açı ve mesafe bazlı - raycast dışı yan veya çarpraz durumlarda)
             if (!shouldStop && playerTransform != null)
             {
                 Vector3 toP = playerTransform.position - transform.position;
@@ -204,7 +217,7 @@ namespace TrafikParkuru.Core
                 {
                     float angle   = Vector3.Angle(transform.forward, toP.normalized);
                     float lateral = Mathf.Abs(Vector3.Dot(toP, transform.right));
-                    if (angle < 25f && lateral < 2.0f)
+                    if (angle < 45f && lateral < 2.5f)
                     {
                         if (dP < stopDistance) shouldStop = true;
                         else slowFactor = Mathf.Min(slowFactor,

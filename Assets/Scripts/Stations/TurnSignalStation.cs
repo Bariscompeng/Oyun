@@ -47,6 +47,15 @@ namespace TrafikParkuru.Stations
                 // Sinyalin acik oldugu sureyi biriktir
                 rightSignalAccumulatedTime += Time.deltaTime;
             }
+
+            // Dönüşün tamamlanıp tamamlanmadığını kontrol et (Z yönünden Doğuya/X yönüne dönüş, açı ~90 derece)
+            float angle = playerSignals.transform.eulerAngles.y;
+            if (angle < 0) angle += 360f;
+
+            if (angle > 70f && angle < 110f && playerSignals.transform.position.x > 3.0f)
+            {
+                EvaluatePass();
+            }
         }
 
         private void EvaluatePass()

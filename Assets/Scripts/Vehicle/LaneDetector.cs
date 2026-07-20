@@ -34,40 +34,65 @@ namespace TrafikParkuru.Vehicle
             bool currentViolation = false;
             string reason = "";
 
-            // Hangi yolda olduğumuzu belirle (Kavşak bölgesi Z: [-5, 5] & X <= 5 hariç)
-            bool inIntersection = (pos.z >= -5f && pos.z <= 5f && pos.x <= 5f);
-
-            if (!inIntersection)
+            // 1. Segment 1: Ana Yol (Z < -8 ve X < 10)
+            if (pos.z < -8f && pos.x < 10f)
             {
-                if (pos.z < -5f)
+                if (pos.x < mainRoadMinX)
                 {
-                    // Ana yol (Z < -5)
-                    if (pos.x < mainRoadMinX)
-                    {
-                        currentViolation = true;
-                        reason = "Şerit İhlali: Karşı şeride geçtiniz!";
-                    }
-                    else if (pos.x > mainRoadMaxX)
-                    {
-                        currentViolation = true;
-                        reason = "Şerit İhlali: Kaldırıma/Yol dışına çıktınız!";
-                    }
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Karşı şeride geçtiniz!";
                 }
-                else if (pos.x > 5f)
+                else if (pos.x > mainRoadMaxX)
                 {
-                    // Yan yol (X > 5)
-                    if (pos.z > sideRoadMaxZ)
-                    {
-                        currentViolation = true;
-                        reason = "Şerit İhlali: Karşı şeride geçtiniz!";
-                    }
-                    else if (pos.z < sideRoadMinZ)
-                    {
-                        currentViolation = true;
-                        reason = "Şerit İhlali: Kaldırıma/Yol dışına çıktınız!";
-                    }
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Kaldırıma/Yol dışına çıktınız!";
                 }
             }
+            // 2. Segment 2: Yan Yol 1 (X > 9 ve X < 45 ve Z < 10)
+            else if (pos.x > 9f && pos.x < 45f && pos.z < 10f)
+            {
+                if (pos.z > sideRoadMaxZ)
+                {
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Karşı şeride geçtiniz!";
+                }
+                else if (pos.z < sideRoadMinZ)
+                {
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Kaldırıma/Yol dışına çıktınız!";
+                }
+            }
+            // 3. Segment 3: Hız Sınırı Yan Yol 2 (Z > 5 ve Z < 25 ve X > 45)
+            else if (pos.z > 5f && pos.z < 25f && pos.x > 45f)
+            {
+                // Sağ şerit (Kuzey yönü): X [49.5, 54.85]
+                if (pos.x < 49.5f)
+                {
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Karşı şeride geçtiniz!";
+                }
+                else if (pos.x > 54.85f)
+                {
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Kaldırıma/Yol dışına çıktınız!";
+                }
+            }
+            // 4. Segment 4: 2. Yaya ve Bitiş Yan Yol 3 (Z > 25 ve X < 45)
+            else if (pos.z > 25f && pos.x < 45f)
+            {
+                // Sağ şerit (Batı yönü): Z [29.5, 34.85]
+                if (pos.z < 29.5f)
+                {
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Karşı şeride geçtiniz!";
+                }
+                else if (pos.z > 34.85f)
+                {
+                    currentViolation = true;
+                    reason = "Şerit İhlali: Kaldırıma/Yol dışına çıktınız!";
+                }
+            }
+            // Diğer tüm durumlar kavşak/dönüş geçiş bölgeleridir (Junction 1, 2, 3), ceza uygulanmaz.
 
             if (currentViolation)
             {

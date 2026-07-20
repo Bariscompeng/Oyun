@@ -40,17 +40,17 @@ public class HudController : MonoBehaviour
 
         if (speedText != null)
         {
-            speedText.text = $"{Mathf.RoundToInt(car.SpeedKmh)} km/s";
+            speedText.text = $"<size=160%><b>{Mathf.RoundToInt(car.SpeedKmh)}</b></size> <size=80%><color=#94A3B8>km/h</color></size>";
         }
 
         if (scoreText != null && ScenarioManager.Instance != null)
         {
-            scoreText.text = $"Puan: {ScenarioManager.Instance.GetTotalScore()} / 100";
+            scoreText.text = $"<color=#00F2FF><b>PUAN:</b></color> <color=#FFFFFF>{ScenarioManager.Instance.GetTotalScore()} / 100</color>";
         }
 
         if (timeText != null && ScenarioManager.Instance != null)
         {
-            timeText.text = $"Süre: {ScenarioManager.Instance.ElapsedTime:F1} sn";
+            timeText.text = $"<color=#00F2FF><b>SÜRE:</b></color> <color=#FFFFFF>{ScenarioManager.Instance.ElapsedTime:F1} sn</color>";
         }
 
         if (signalController == null)
